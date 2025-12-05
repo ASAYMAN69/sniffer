@@ -9,7 +9,6 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
-    min-height: 100vh; /* Keep min-height on general body */
     overflow-x: hidden;
     background-image: 
         radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 20%),
@@ -19,13 +18,22 @@ body {
 body.app-body {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 2.5rem); /* Account for new header height */
+    height: 100vh; /* Use full viewport */
 }
 
-.container {
+header {
+    flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+main.container { /* Target main container specifically */
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* Scroll content if needed */
+    padding: 2rem 1.5rem; /* Re-add padding to main content */
+}
+
+.container { /* General container, remove padding that affects main content */
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem 1.5rem; /* Re-add padding to container */
 }
 
 .btn-danger:hover {
