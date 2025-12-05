@@ -1,5 +1,5 @@
 const Database = require('better-sqlite3');
-const { DATABASE_FILE } = require('./backend/config');
+const { DATABASE_FILE } = require('./config');
 
 const db = new Database(DATABASE_FILE);
 
