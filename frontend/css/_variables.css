@@ -1,0 +1,50 @@
+:root {
+    --primary: #8b5cf6;
+    --primary-dark: #7c3aed;
+    --secondary: #10b981;
+    --dark-bg: #0f172a;
+    --dark-card: #1e293b;
+    --dark-border: #334155;
+    --light-bg: #f8fafc;
+    --light-card: #ffffff;
+    --light-border: #e2e8f0;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text-dark: #0f172a;
+    --text-light: #f1f5f9;
+    --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --border-radius: 12px;
+    --transition-slow: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --false: #E81B1B; /* Moved from .switch */
+    --true: #009068; /* Moved from .switch */
+}
+
+
+.dark {
+    --bg-color: var(--dark-bg);
+    --card-bg: var(--dark-card);
+    --card-bg-rgb: 30, 41, 59;
+    --border-color: var(--dark-border);
+    --text-color: var(--text-light);
+    --header-bg: rgba(30, 41, 59, 0.8);
+    --modal-bg: rgba(15, 23, 42, 0.95);
+    --subtle-bg: var(--dark-card);
+    --subtle-bg-rgb: var(--card-bg-rgb);
+    --view-switch-bg: var(--dark-border);
+}
+
+.light {
+    --bg-color: var(--light-bg);
+    --card-bg: var(--light-card);
+    --card-bg-rgb: 255, 255, 255;
+    --border-color: var(--light-border);
+    --text-color: var(--text-dark);
+    --header-bg: rgba(255, 255, 255, 0.8);
+    --modal-bg: rgba(248, 250, 252, 0.95);
+    --subtle-bg: var(--light-card);
+    --subtle-bg-rgb: var(--card-bg-rgb);
+    --view-switch-bg: var(--light-border);
+}

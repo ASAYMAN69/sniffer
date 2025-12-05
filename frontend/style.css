@@ -1,0 +1,9 @@
+.btn-gray {
+    background-color: var(--gray); /* Using a variable if available, otherwise a direct gray color */
+    color: var(--text-color); /* Adjust text color for readability */
+    /* Inherit other button styles or define here */
+}
+
+.btn-gray:hover {
+    background-color: var(--light-border); /* Slightly darker gray on hover */
+}
