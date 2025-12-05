@@ -1,6 +1,6 @@
 const http = require('http');
 const crypto = require('crypto');
-const { insertStmt } = require('../database');
+const { insertStmt } = require('./database');
 const { TARGET_HOST, TARGET_PORT, MAX_BODY_BYTES } = require('./config');
 const { WebSocket, WebSocketServer } = require('ws');
 

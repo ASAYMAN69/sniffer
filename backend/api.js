@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const { WebSocketServer } = require('ws');
-const { listStmt, getStmt, clearStmt, db, insertStmt } = require('../database');
+const { listStmt, getStmt, clearStmt, db, insertStmt } = require('./database');
 const fetch = require('node-fetch'); // For making API calls to Gemini
 const crypto = require('crypto'); // Import crypto module
 
