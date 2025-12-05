@@ -385,16 +385,15 @@ app.post('/api/replay', async (req, res) => {
         // Send a WebSocket message to notify frontend of new replayed request
         wss.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    id: record.id,
-                    startedAt: record.startedAt,
-                    durationMs: record.durationMs,
-                    method: record.method,
-                    url: record.url,
-                    res_status: record.res_status,
-                    replayed: record.replayed // Send replayed status
-                }));
-            }
+                                    client.send(JSON.stringify({
+                                        id: record.id,
+                                        startedAt: record.startedAt,
+                                        durationMs: record.durationMs,
+                                        method: record.method,
+                                        url: record.url,
+                                        status: record.res_status, // Changed from res_status to status
+                                        replayed: record.replayed // Send replayed status
+                                    }));            }
         });
 
         res.json({ ok: true, newRequestId: record.id });

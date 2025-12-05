@@ -115,7 +115,7 @@ function createProxyServer(wss) {
                                 durationMs,
                                 method: clientReq.method,
                                 url: clientReq.url,
-                                res_status: upstreamRes.statusCode
+                                status: upstreamRes.statusCode // Changed from res_status to status
                             }));
                         }
                     });
