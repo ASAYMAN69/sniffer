@@ -1,0 +1,261 @@
+⭐ Must-Have Enhancements (super practical)
+
+1️⃣ Search & filtering UI
+
+You’ll want to filter by:
+
+method
+
+URL substring
+
+status code
+
+time range
+
+request/response body contents
+
+header value
+
+
+This makes the inspector actually usable once you have hundreds/thousands of logs.
+
+Implementation:
+Add a /api/search endpoint and add a search bar in the UI.
+
+
+---
+
+2️⃣ JSON auto-format + syntax highlighting
+
+If the request/response bodies contain JSON, show them pretty-printed with colors.
+
+Why:
+Raw JSON or minified JSON is a pain to read.
+
+
+---
+
+3️⃣ “Replay request” button
+
+Click a saved request → send the exact same request again to the proxy.
+
+Useful for:
+
+debugging flaky endpoints
+
+testing backend without the frontend
+
+brute-force style repeating
+
+
+
+---
+
+4️⃣ Export request as cURL / fetch / axios
+
+At the click of a button:
+
+“Copy as cURL”
+
+“Copy as fetch()”
+
+“Copy as Axios”
+
+
+Super useful for debugging or sharing with others.
+
+
+---
+
+5️⃣ Body size histogram + analytics
+
+A small panel showing:
+
+number of requests
+
+average latency
+
+fastest/slowest endpoints
+
+most-requested routes
+
+
+Gives visibility like real monitoring tools (but local).
+
+
+---
+
+🔥 Developer Superpowers (advanced, but extremely useful)
+
+6️⃣ Response modification rules (“rewrite engine”)
+
+Let you add rules like:
+
+Replace response body for /api/users
+
+Inject header X-Debug: 1
+
+Strip cookies
+
+Change status code
+
+Mock entire endpoints
+
+
+This effectively turns your proxy into a local API mock / patch server.
+
+
+---
+
+7️⃣ Request modification rules
+
+Like mitmproxy, but simpler:
+
+Add query params
+
+Inject headers
+
+Replace request body
+
+Block certain methods
+
+
+Great for debugging frontend code.
+
+
+---
+
+8️⃣ “Breakpoint mode” (pause/resume requests)
+
+A wild feature:
+
+You click a request in the UI while it's being proxied
+
+The proxy pauses before forwarding to the upstream
+
+You manually edit headers/body
+
+Then click “continue”
+
+
+This is basically a “debugger” for HTTP.
+
+
+---
+
+9️⃣ SSE/WebSockets live inspector
+
+Instead of polling every second, use:
+
+Server-Sent Events (easy)
+
+WebSockets (full duplex)
+
+
+This lets you stream incoming requests to the UI instantly.
+
+
+---
+
+🔟 Plugin system
+
+You allow users to drop JS files into something like ~/.sniffer/plugins/ where each file can:
+
+intercept requests
+
+modify them
+
+log to DB
+
+add headers
+
+validate data
+
+block/allow certain traffic
+
+
+This makes it hugely extensible.
+
+
+---
+
+🧪 Experimental / Cool Stuff
+
+11️⃣ Timeline waterfall view (like Chrome devtools)
+
+Visualize requests on a timeline:
+
+when they started
+
+how long they waited
+
+DNS / connect / transfer phases (for later TCP-level version)
+
+
+Looks slick and helps understand concurrency.
+
+
+---
+
+12️⃣ Diff tool for responses
+
+Compare:
+
+two responses
+
+two bodies
+
+two header sets
+
+
+Nice for regression testing.
+
+
+---
+
+13️⃣ “Mock server mode”
+
+Let you replay stored responses as if they were the real backend.
+
+Example:
+You capture the /products response once, then disconnect your internet/backend, and use the proxy as a local stub server.
+
+
+---
+
+14️⃣ Manual raw TCP viewer
+
+Even though you said “HTTP only for now,” you can still prepare the UI to show RAW mode for later.
+
+
+---
+
+🧩 Infrastructure Improvements
+
+15️⃣ Auto-rotation of logs
+
+When DB exceeds:
+
+1GB
+
+or N records
+Rotate to database-2025-12-27.sqlite.
+
+
+
+---
+
+16️⃣ API keys for the inspector
+
+Tiny security layer — optional.
+
+
+---
+
+17️⃣ Docker support
+
+Start the proxy like:
+
+docker run -p 5656:5656 -p 4040:4040 sniffer:v1
+
+Just quality-of-life.

@@ -1,0 +1,17 @@
+{
+  "name": "sniffer-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Sniffer application",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  }
+}

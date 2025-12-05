@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packet Intelligence Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --dark: #2d3436;
+            --light: #f7f9fc;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #ff7675;
+            --gray: #dfe6e9;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #636e72;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.6);
+        }
+
+        .analyze-btn:active {
+            transform: translateY(1px);
+        }
+
+        .analyze-btn i {
+            font-size: 1.2rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transform: translateY(20px);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            overflow: visible;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 10;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 0;
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-content {
+            padding: 40px;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: calc(90vh - 120px); /* Header height + footer potential space */
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--gray);
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: var(--gray);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        .loading-container {
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--primary-dark);
+            min-height: 32px;
+        }
+
+        .blinking-text {
+            animation: blink 2.5s infinite;
+            font-weight: 700;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 30px auto;
+            background: var(--gray);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .results-container {
+            display: none;
+            width: 100%;
+            perspective: 1000px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            text-align: left;
+            transform: translateX(-100px) rotateY(-10deg);
+            opacity: 0;
+            transition: var(--transition);
+            border-top: 4px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s ease;
+        }
+
+        .card.active {
+            transform: translateX(0) rotateY(0);
+            opacity: 1;
+        }
+
+        .card.active::before {
+            transform: scaleX(1);
+        }
+
+        .card.security { border-top-color: var(--danger); }
+        .card.insights { border-top-color: var(--secondary); }
+        .card.performance { border-top-color: var(--success); }
+        .card.recommendations { border-top-color: var(--warning); }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .card.security .card-icon { color: var(--danger); }
+        .card.insights .card-icon { color: var(--secondary); }
+        .card.performance .card-icon { color: var(--success); }
+        .card.recommendations .card-icon { color: var(--warning); }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .card-content {
+            color: #555;
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        footer {
+            margin-top: 3rem;
+            color: #636e72;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 25px 20px;
+                max-height: calc(90vh - 100px);
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Packet Intelligence Analyzer</h1>
+            <p class="subtitle">Advanced AI-powered analysis of network packets to provide deep insights into security, performance, and optimization opportunities</p>
+            <button class="analyze-btn" id="analyzeBtn">
+                <i class="fas fa-bolt"></i> Analyze Packet
+            </button>
+        </header>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2 class="modal-title">Packet Analysis</h2>
+                    <button class="close-modal" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-content">
+                        <div class="loading-container" id="loadingContainer">
+                            <div class="loading-text">
+                                AI is going through the packet <span class="blinking-text">|</span>
+                            </div>
+                            <div class="loading-dots">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                            <div class="progress-label">
+                                <span>Processing</span>
+                                <span id="progressText">0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="results-container" id="resultsContainer">
+                            <div class="cards-grid">
+                                <div class="card security">
+                                    <i class="fas fa-shield-alt card-icon"></i>
+                                    <h3 class="card-title">Security</h3>
+                                    <p class="card-content" id="securityContent"></p>
+                                </div>
+                                <div class="card insights">
+                                    <i class="fas fa-lightbulb card-icon"></i>
+                                    <h3 class="card-title">Insights</h3>
+                                    <p class="card-content" id="insightsContent"></p>
+                                </div>
+                                <div class="card performance">
+                                    <i class="fas fa-tachometer-alt card-icon"></i>
+                                    <h3 class="card-title">Performance</h3>
+                                    <p class="card-content" id="performanceContent"></p>
+                                </div>
+                                <div class="card recommendations">
+                                    <i class="fas fa-cogs card-icon"></i>
+                                    <h3 class="card-title">Recommendations</h3>
+                                    <p class="card-content" id="recommendationsContent"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Packet Intelligence Analyzer &copy; 2025 | Advanced Network Security Solutions</p>
+        </footer>
+    </div>
+
+    <script>
+        // Hardcoded AI response payload with longer content for testing scrolling
+        const aiResponse = {
+            security: "Critical vulnerability detected: Unencrypted credentials in HTTP requests. Immediate action required: Implement TLS 1.3 encryption across all endpoints. Anomalous traffic patterns observed from IP 192.168.1.105 - recommend isolation and forensic analysis. Additional security findings include:\n\n- Outdated SSL/TLS protocols detected on 3 endpoints\n- Potential SQL injection vulnerability in user login API\n- Missing HSTS headers on critical authentication pages\n- Excessive permission grants detected in OAuth flows\n- Brute force protection thresholds set too high\n- Missing CSP headers on payment processing pages\n- Insecure cookie flags on session tokens",
+            insights: "Packet analysis reveals 43% of traffic is redundant requests to deprecated APIs. User sessions show unusual latency spikes between 2-4 AM UTC. Database queries account for 68% of total packet size - optimization opportunity identified in JOIN operations. Deep analysis shows:\n\n- Mobile clients generate 2.5x more requests than desktop equivalents\n- API versioning inconsistency causing duplicate payload transfers\n- Image assets not properly cached (cache-control headers missing)\n- WebSocket connections maintaining idle state beyond threshold\n- Geolocation routing inefficiencies detected\n- Client-side validation missing on 3 critical forms\n- Resource bundling opportunities identified for frontend assets",
+            recommendations: "1. Implement rate limiting on authentication endpoints\n2. Migrate to HTTP/3 for reduced latency\n3. Apply query optimization on user profile endpoints\n4. Enable Brotli compression for API responses\n5. Deploy WAF rules for SQL injection patterns\n6. Implement proper cache-control headers for static assets\n7. Add HSTS headers with max-age=31536000\n8. Enforce TLS 1.3 across all endpoints\n9. Implement proper CSP headers\n10. Add security.txt file for vulnerability disclosure\n11. Set secure and httpOnly flags on all cookies\n12. Implement bot detection on high-value endpoints",
+            performance: "Current throughput: 1.2 Gbps (72% capacity). Latency metrics exceed thresholds by 210ms. Connection pool utilization at 89% - risk of saturation during peak hours. TLS handshake time accounts for 38% of total request time. Recommend connection reuse strategy and TLS session caching. Additional findings:\n\n- Database connection pool saturation during peak hours\n- Unoptimized image payloads increasing transfer times\n- Third-party API dependencies causing cascade failures\n- Inefficient client-side rendering causing layout thrashing\n- CDN cache hit rate below industry standards (62%)\n- Unnecessary synchronous operations blocking main thread\n- WebSocket reconnection storms detected during failovers\n- Memory leak detected in authentication service\n- Garbage collection pauses affecting real-time processing"
+        };
+
+        // Loading messages that rotate every 2.5s
+        const loadingMessages = [
+            "AI is going through the packet",
+            "Analyzing network patterns",
+            "Detecting security anomalies",
+            "Optimizing performance metrics",
+            "Generating actionable insights",
+            "Compiling recommendations"
+        ];
+
+        // DOM Elements
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const closeModal = document.getElementById('closeModal');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const blinkingText = document.querySelector('.blinking-text');
+        const loadingText = document.querySelector('.loading-text');
+        
+        // Card elements
+        const securityContent = document.getElementById('securityContent');
+        const insightsContent = document.getElementById('insightsContent');
+        const performanceContent = document.getElementById('performanceContent');
+        const recommendationsContent = document.getElementById('recommendationsContent');
+
+        // State variables
+        let messageIndex = 0;
+        let progress = 0;
+        let animationFrame;
+
+        // Open modal and start analysis
+        analyzeBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+            startAnalysis();
+        });
+
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+            resetAnalysis();
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+                resetAnalysis();
+            }
+        });
+
+        // Start the analysis process
+        function startAnalysis() {
+            resetAnalysis();
+            loadingContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            // Start message rotation
+            rotateMessages();
+            
+            // Start progress animation
+            animateProgress();
+            
+            // Simulate AI processing delay (10 seconds)
+            setTimeout(showResults, 10000);
+        }
+
+        // Rotate loading messages every 2.5 seconds
+        function rotateMessages() {
+            loadingText.textContent = loadingMessages[messageIndex];
+            messageIndex = (messageIndex + 1) % loadingMessages.length;
+            setTimeout(rotateMessages, 2500);
+        }
+
+        // Animate progress bar
+        function animateProgress() {
+            if (progress < 100) {
+                progress += 0.5;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}%`;
+                animationFrame = requestAnimationFrame(animateProgress);
+            }
+        }
+
+        // Show results after analysis
+        function showResults() {
+            cancelAnimationFrame(animationFrame);
+            
+            // Fill card content
+            securityContent.textContent = aiResponse.security;
+            insightsContent.textContent = aiResponse.insights;
+            performanceContent.textContent = aiResponse.performance;
+            recommendationsContent.textContent = aiResponse.recommendations;
+            
+            // Switch views
+            loadingContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            // Trigger card animations
+            setTimeout(() => {
+                document.querySelectorAll('.card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('active');
+                    }, 300 * (index + 1));
+                });
+            }, 300);
+        }
+
+        // Reset analysis state
+        function resetAnalysis() {
+            cancelAnimationFrame(animationFrame);
+            progress = 0;
+            messageIndex = 0;
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+            loadingText.textContent = loadingMessages[0];
+            resultsContainer.style.display = 'none';
+            loadingContainer.style.display = 'block';
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Reset scroll position
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.scrollTop = 0;
+            }
+        }
+
+        // Initialize with a subtle animation
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelector('header').style.opacity = '1';
+                document.querySelector('header').style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
