@@ -130,4 +130,5 @@ td {
     -webkit-overflow-scrolling: touch;
     flex-grow: 1; /* Allow to fill available space */
     overflow-y: auto; /* Allow vertical scrolling for tables */
+    height: 0; /* Important for flex-grow to work with overflow */
 }
