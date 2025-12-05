@@ -36,6 +36,61 @@ function updateWsStatus(isConnected) {
     }
 }
 
+let ws;
+let reconnectInterval;
+
+function connectWebSocket() {
+    // Determine WebSocket URL dynamically
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}`; // Assuming WebSocket is served from the same host and port
+
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => {
+        console.log('WebSocket connected');
+        updateWsStatus(true);
+        if (reconnectInterval) {
+            clearInterval(reconnectInterval);
+            reconnectInterval = null;
+        }
+    };
+
+    ws.onmessage = (event) => {
+        if (isPaused) return; // Skip update if paused
+        const requestData = JSON.parse(event.data);
+        console.log('Received WebSocket message:', requestData);
+
+        // Convert timestamp to human-readable format
+        requestData.time = new Date(requestData.startedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        requestData.duration = `${requestData.durationMs}ms`;
+
+        // Add new request to the beginning of the array
+        allRequests.unshift(requestData);
+        // Only keep the latest 1000 requests to prevent performance issues
+        allRequests = allRequests.slice(0, 1000);
+        
+        applyFilters(); // Re-render the table with the new data
+    };
+
+    ws.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.reason);
+        updateWsStatus(false);
+        // Attempt to reconnect after a delay
+        if (!reconnectInterval) {
+            reconnectInterval = setInterval(() => {
+                console.log('Attempting to reconnect WebSocket...');
+                connectWebSocket();
+            }, 5000); // Try every 5 seconds
+        }
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        ws.close(); // Close to trigger onclose and reconnection attempt
+    };
+}
+
 // Check for saved theme preference or respect OS preference
 const savedTheme = localStorage.getItem('theme');
 const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
@@ -113,6 +168,50 @@ async function fetchInitialRequests() {
         console.error('Error fetching initial requests:', error);
     }
 }
+
+// Function to apply filters and render the table
+function applyFilters() {
+    const searchInput = document.getElementById('searchInput');
+    const methodFilter = document.getElementById('methodFilter');
+    const statusFilter = document.getElementById('statusFilter');
+
+    let filteredRequests = [...allRequests]; // Start with a copy of all requests
+
+    // Apply search filter
+    if (searchInput && searchInput.value) {
+        const searchTerm = searchInput.value.toLowerCase();
+        filteredRequests = filteredRequests.filter(req =>
+            req.url.toLowerCase().includes(searchTerm) ||
+            req.method.toLowerCase().includes(searchTerm) ||
+            req.status.toLowerCase().includes(searchTerm)
+        );
+    }
+
+    // Apply method filter
+    if (methodFilter && methodFilter.value) {
+        filteredRequests = filteredRequests.filter(req => req.method === methodFilter.value);
+    }
+
+    // Apply status filter
+    if (statusFilter && statusFilter.value) {
+        const statusCodePrefix = statusFilter.value; // e.g., '2', '3', '4', '5'
+        filteredRequests = filteredRequests.filter(req => req.status.startsWith(statusCodePrefix));
+    }
+
+    renderTable(filteredRequests);
+}
+
+// Event Listeners for filters
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('methodFilter').addEventListener('change', applyFilters);
+document.getElementById('statusFilter').addEventListener('change', applyFilters);
+document.getElementById('resetFilters').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('methodFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    applyFilters();
+});
+
 
 function renderTable(requests) {
     const requestsTableBody = document.getElementById('requestsTable');
@@ -412,6 +511,65 @@ if (saveResBodyBtn) {
     });
 }
 
+function mimeToExtension(mimeType) {
+    if (!mimeType) return 'bin'; // Default to generic binary
 
+    const type = mimeType.toLowerCase();
+    if (type.includes('json')) return 'json';
+    if (type.includes('html')) return 'html';
+    if (type.includes('css')) return 'css';
+    if (type.includes('javascript')) return 'js';
+    if (type.includes('image/jpeg')) return 'jpg';
+    if (type.includes('image/png')) return 'png';
+    if (type.includes('image/gif')) return 'gif';
+    if (type.includes('image/svg+xml')) return 'svg';
+    if (type.includes('application/pdf')) return 'pdf';
+    if (type.includes('audio/mpeg')) return 'mp3';
+    if (type.includes('audio/wav')) return 'wav';
+    if (type.includes('video/mp4')) return 'mp4';
+    if (type.includes('video/webm')) return 'webm';
+    if (type.includes('text/plain')) return 'txt';
+    if (type.includes('xml')) return 'xml';
+    
+    // Generic fallback if no specific match
+    const parts = type.split('/');
+    if (parts.length > 1) {
+        // Use the subtype if it's not too generic (e.g., 'image' from 'image/jpeg')
+        const subType = parts[1];
+        if (subType !== 'octet-stream' && subType !== 'x-') return subType;
+    }
+    return 'bin'; // Fallback to generic binary
+}
 
+function downloadResponseBody(content, contentType) {
+    const filename = `response_body.${mimeToExtension(contentType)}`;
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Control') {
+        isPaused = true;
+        console.log('WebSocket updates paused (Ctrl key held)');
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    if (e.key === 'Control') {
+        isPaused = false;
+        console.log('WebSocket updates resumed (Ctrl key released)');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchInitialRequests(); // Fetch initial requests on load
+    applyFilters(); // Apply filters immediately to render table
+    connectWebSocket(); // Establish WebSocket connection
+});
