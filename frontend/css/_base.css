@@ -19,7 +19,7 @@ body {
 body.app-body {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 4rem); /* Account for header height */
+    height: calc(100vh - 2.5rem); /* Account for new header height */
 }
 
 .container {
