@@ -391,7 +391,7 @@ app.post('/api/replay', async (req, res) => {
                                         durationMs: record.durationMs,
                                         method: record.method,
                                         url: record.url,
-                                        status: record.res_status, // Changed from res_status to status
+                                        status: String(record.res_status), // Convert to string
                                         replayed: record.replayed // Send replayed status
                                     }));            }
         });
