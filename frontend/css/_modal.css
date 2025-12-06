@@ -1,131 +1,129 @@
-/* Modal Styles */
+/* General Modal Styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
-    transition: var(--transition-slow);
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-overlay.active {
     opacity: 1;
-    pointer-events: all;
+    visibility: visible;
 }
 
 .modal {
-    background: var(--modal-bg);
-    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
     border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
     width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
-    overflow: hidden;
-    transform: translateY(20px);
-    opacity: 0;
-    transition: var(--transition-slow);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-    display: flex;
-    flex-direction: column;
+    max-width: 600px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+    display: flex; /* Added for internal layout */
+    flex-direction: column; /* Added for internal layout */
+    max-height: 90vh; /* Limit modal height */
 }
 
 .modal-overlay.active .modal {
     transform: translateY(0);
-    opacity: 1;
 }
 
 .modal-header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .modal-title {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     font-weight: 600;
+    color: var(--text-color);
 }
 
 .close-modal {
     background: none;
     border: none;
-    color: var(--text-color);
     font-size: 1.5rem;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
+    color: var(--text-color);
+    transition: color 0.2s ease;
 }
 
 .close-modal:hover {
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary);
 }
 
 .modal-content {
     padding: 1.5rem;
-    overflow-y: auto;
-    flex: 1;
+    overflow-y: auto; /* Enable scrolling for content */
+    flex-grow: 1; /* Allow content to grow and take available space */
+    word-break: break-word; /* Prevent long strings from overflowing */
 }
 
-.request-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+/* Replay Modal Specific Styles */
+.modal-content .form-group {
+    margin-bottom: 1rem; /* Add some vertical spacing between form groups */
 }
 
-.detail-card {
-    background: var(--card-bg);
+.modal-content .form-group label {
+    display: block; /* Ensure label is on its own line */
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.modal-content .form-control { /* General styling for inputs and textareas in modal forms */
+    width: 100%;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 1.25rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
 }
 
-.detail-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
+.modal-content .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+/* Specific styling for select in forms */
+.modal-content select.form-control {
+    -webkit-appearance: none; /* Remove default arrow on WebKit browsers */
+    -moz-appearance: none;    /* Remove default arrow on Firefox */
+    appearance: none;         /* Remove default arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Csvg%3E"); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem; /* Make space for the custom arrow */
+}
+
+.modal-content .modal-actions {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.detail-content {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 8px;
-}
-
-.dark .detail-content {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.metadata-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    justify-content: flex-end;
     gap: 1rem;
     margin-top: 1.5rem;
 }
-
 .metadata-item {
     display: flex;
     flex-direction: column;
