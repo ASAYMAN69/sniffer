@@ -1,29 +1,4 @@
-// Theme toggle functionality
-const darkModeToggle = document.getElementById('dark-mode-toggle-input');
-const body = document.body;
 
-const applyTheme = (isDark) => {
-    if (isDark) {
-        body.classList.add('dark');
-        body.classList.remove('light');
-    } else {
-        body.classList.add('light');
-        body.classList.remove('dark');
-    }
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-};
-
-const savedTheme = localStorage.getItem('theme');
-const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-let initialIsDark = savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches);
-
-if (darkModeToggle) {
-    darkModeToggle.checked = initialIsDark;
-    applyTheme(initialIsDark);
-    darkModeToggle.addEventListener('change', () => {
-        applyTheme(darkModeToggle.checked);
-    });
-}
 
 // Mock Data
 const mockConversations = {

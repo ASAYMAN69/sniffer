@@ -136,6 +136,7 @@ main {
     display: grid;
     grid-template-columns: 2fr 3fr; /* Example, adjust as needed */
     gap: 20px;
+    height: 100%;
 }
 
 .table-container {
@@ -146,6 +147,7 @@ main {
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Hide scrollbar when not needed */
+    height: 100%; /* Ensure it fills the available height in the grid */
 }
 
 .table-header {

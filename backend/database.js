@@ -49,7 +49,7 @@ INSERT INTO requests (
 `);
 
 const listStmt = db.prepare(`
-SELECT id, startedAt, endedAt, durationMs, method, url, res_status
+SELECT id, startedAt, endedAt, durationMs, method, url, res_status, replayed
 FROM requests
 ORDER BY startedAt DESC
 LIMIT ?

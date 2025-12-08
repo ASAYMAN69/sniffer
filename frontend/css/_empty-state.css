@@ -60,3 +60,25 @@
     max-width: 500px;
     margin: 0 auto 1.5rem;
 }
+
+.empty-state-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: var(--text-color-secondary);
+    text-align: center;
+}
+
+.empty-state-icon svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.3;
+}
+
+.empty-state-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-top: 1rem;
+}

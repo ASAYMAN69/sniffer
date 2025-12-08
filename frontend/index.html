@@ -25,6 +25,8 @@
     <link rel="stylesheet" href="css/_responsive.css">
     <link rel="stylesheet" href="css/_ai_modal.css">
     <link rel="stylesheet" href="css/_switch.css">
+    <link rel="stylesheet" href="css/_replay.css">
+    <link rel="stylesheet" href="css/_warning-modal.css">
 </head>
 <body class="light app-body">
     <header>
@@ -152,17 +154,25 @@
             <div id="packetInspectionDashboard" class="table-container">
                 <div class="table-header">
                     <div class="packet-inspection-header">
-                        <div class="table-title">Packet Inspection</div>
+                        <div class="table-title">Details</div>
                         <div class="packet-inspection-controls">
-                            <button class="btn btn-ai-analyze" id="aiAnalyzeBtn"><i class="fas fa-sparkles"></i></button>
+                            <button class="btn btn-ai-analyze" id="aiAnalyzeBtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 0L14.5 8.5L24 12L14.5 15.5L12 24L9.5 15.5L0 12L9.5 8.5L12 0Z" fill="currentColor"/>
+</svg></button>
                             <button class="btn btn-primary btn-replay" id="replayBtn"><i class="fas fa-redo"></i></button>
                             <span>Beautifier</span>
                             <label class="switch"> <input type="checkbox" id="jsonBeautifyToggle"> </label>
                         </div>
                     </div>                </div>
                 <div class="modal-content" style="padding: 1rem; overflow-y: auto; flex-grow: 1;">
-                    <p id="packetInspectionMessage" class="packet-inspection-message">Click a request in the table to inspect its details.</p>
-                    <div id="packetDetails">
+                    <div class="empty-state-container" id="emptyStateContainer">
+                        <div class="empty-state-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mouse-pointer"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path><path d="M13 13l6 6"></path></svg>
+                        </div>
+                        <div class="empty-state-text">Click a request to view its contents</div>
+                    </div>
+                    <p id="packetInspectionMessage" class="packet-inspection-message" style="display: none;">Click a request in the table to inspect its details.</p>
+                    <div id="packetDetails" style="display: none;">
                         <div class="detail-card">
                             <div class="detail-title">
                                 <i class="fas fa-database"></i>
@@ -332,91 +342,86 @@ Date: Wed, 28 Nov 2025 15:30:45 GMT</div>
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-content">
-                <div class="stats-grid">
-                    <div class="stat-card requests">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-title">TOTAL REQUESTS</div>
-                                <div class="stat-value">248</div>
+                        <div class="modal-content">
+                            <div class="stats-layout-wrapper">
+                                <div class="stats-left-section">
+                                    <div class="stats-grid">
+                                        <div class="stat-card requests">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-title">TOTAL REQUESTS</div>
+                                                    <div class="stat-value">248</div>
+                                                </div>
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="stat-card methods">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-title">TOP METHOD</div>
+                                                    <div class="stat-value">GET</div>
+                                                </div>
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-code"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="stat-card status">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-title">SUCCESS RATE</div>
+                                                    <div class="stat-value">98.2%</div>
+                                                </div>
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="stat-card performance">
+                                            <div class="stat-header">
+                                                <div>
+                                                    <div class="stat-title">AVG. RESPONSE TIME</div>
+                                                    <div class="stat-value">185ms</div>
+                                                </div>
+                                                <div class="stat-icon">
+                                                    <i class="fas fa-tachometer-alt"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+            
+                                    <div class="chart-card visualization-piechart">
+                                        <div class="chart-header">
+                                            <div class="chart-title">Status Codes</div>
+                                        </div>
+                                        <div class="chart-container">
+                                            <canvas id="statusChartModal"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+            
+                                <div class="stats-right-section">
+                                    <div class="chart-card visualization-bargraph">
+                                        <div class="chart-header">
+                                            <div class="chart-title">Response Time Distribution</div>
+                                            <div class="chart-legend">
+                                                <span class="legend-item"><span class="legend-color bg-green-500"></span> < 200ms</span>
+                                                <span class="legend-item"><span class="legend-color bg-yellow-500"></span> 200-500ms</span>
+                                                <span class="legend-item"><span class="legend-color bg-red-500"></span> > 500ms</span>
+                                            </div>
+                                        </div>
+                                        <div class="chart-container">
+                                            <canvas id="responseTimeChartModal"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="stat-icon">
-                                <i class="fas fa-exchange-alt"></i>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <div class="stat-card methods">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-title">TOP METHOD</div>
-                                <div class="stat-value">GET</div>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="fas fa-code"></i>
-                            </div>
-                        </div>
-                        <div class="stat-change">
-                            
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card status">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-title">SUCCESS RATE</div>
-                                <div class="stat-value">98.2%</div>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <div class="stat-card performance">
-                        <div class="stat-header">
-                            <div>
-                                <div class="stat-title">AVG. RESPONSE TIME</div>
-                                <div class="stat-value">185ms</div>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="fas fa-tachometer-alt"></i>
-                            </div>
-                        </div>
-                        <div class="stat-change">
-                            
-                        </div>
-                    </div>
-                </div>
-
-                <div class="visualization">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-title">Response Time Distribution</div>
-                            <div class="chart-legend">
-                                <span class="legend-item"><span class="legend-color bg-green-500"></span> < 200ms</span>
-                                <span class="legend-item"><span class="legend-color bg-yellow-500"></span> 200-500ms</span>
-                                <span class="legend-item"><span class="legend-color bg-red-500"></span> > 500ms</span>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="responseTimeChartModal"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <div class="chart-title">Status Codes</div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="statusChartModal"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </div>        </div>
     </div>
 
     <div class="modal-overlay" id="aiAnalysisNewModalOverlay">
@@ -476,10 +481,16 @@ Date: Wed, 28 Nov 2025 15:30:45 GMT</div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="js/theme.js"></script>
+    <script type="module" src="js/websocket.js"></script>
+    <script type="module" src="js/requests.js"></script>
+    <script type="module" src="js/packet-details.js"></script>
+    <script type="module" src="js/modals.js"></script>
+    <script type="module" src="js/stats.js"></script>
+    <script type="module" src="js/main.js"></script>
 
     <div class="modal-overlay" id="replayModalOverlay">
-        <div class="modal" style="max-width: 800px;">
+        <div class="modal" style="max-width: 900px; width: 90%;">
             <div class="modal-header">
                 <h2 class="modal-title">Replay Request</h2>
                 <button class="close-modal" id="closeReplayModal">
@@ -487,33 +498,106 @@ Date: Wed, 28 Nov 2025 15:30:45 GMT</div>
                 </button>
             </div>
             <div class="modal-content">
-                <div class="form-group">
-                    <label for="replayMethod">Method:</label>
-                    <select id="replayMethod" class="form-control">
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="PATCH">PATCH</option>
-                        <option value="HEAD">HEAD</option>
-                        <option value="OPTIONS">OPTIONS</option>
-                    </select>
+                <div id="replayInputForm">
+                    <div class="replay-grid">
+                        <div class="replay-col">
+                            <div class="form-group">
+                                <label for="replayMethod">Method:</label>
+                                <select id="replayMethod" class="form-control">
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                    <option value="DELETE">DELETE</option>
+                                    <option value="PATCH">PATCH</option>
+                                    <option value="HEAD">HEAD</option>
+                                    <option value="OPTIONS">OPTIONS</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="replayUrl">URL:</label>
+                                <input type="text" id="replayUrl" class="form-control" placeholder="e.g., http://localhost:3000/api/data">
+                            </div>
+                        </div>
+                        <div class="replay-col">
+                            <div class="replay-tabs">
+                                <div class="replay-tab active" data-tab="headers">Headers</div>
+                                <div class="replay-tab" data-tab="body">Body</div>
+                            </div>
+                            <div class="replay-tab-content active" data-tab-content="headers">
+                                <textarea id="replayHeaders" class="form-control" rows="8" placeholder='{"Content-Type": "application/json"}'></textarea>
+                            </div>
+                            <div class="replay-tab-content" data-tab-content="body">
+                                <textarea id="replayBody" class="form-control" rows="10" placeholder="Raw request body"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" id="sendReplayBtn">Replay</button>
+                        <button class="btn btn-secondary" id="cancelReplayBtn">Cancel</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="replayUrl">URL:</label>
-                    <input type="text" id="replayUrl" class="form-control" placeholder="e.g., http://localhost:3000/api/data">
+
+                <div id="replayResultsDisplay" style="display: none;">
+                    <h3>Replayed Request Details</h3>
+                    <div class="replay-grid">
+                        <div class="replay-col">
+                            <div class="detail-card">
+                                <div class="detail-title"><i class="fas fa-info-circle"></i> Status</div>
+                                <pre class="detail-content" id="replayedStatus"></pre>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-title"><i class="fas fa-database"></i> Request Headers</div>
+                                <pre class="detail-content" id="replayedReqHeaders"></pre>
+                            </div>
+                        </div>
+                        <div class="replay-col">
+                            <div class="detail-card">
+                                <div class="detail-title"><i class="fas fa-file-code"></i> Request Body</div>
+                                <pre class="detail-content" id="replayedReqBody"></pre>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-title"><i class="fas fa-database"></i> Response Headers</div>
+                                <pre class="detail-content" id="replayedResHeaders"></pre>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-title"><i class="fas fa-file-code"></i> Response Body</div>
+                                <pre class="detail-content" id="replayedResBody"></pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="closeReplayResultsBtn">Close</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="replayHeaders">Headers (JSON):</label>
-                    <textarea id="replayHeaders" class="form-control" rows="8" placeholder='{"Content-Type": "application/json"}'></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="selectRequestModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Please select a request</div>
+                <button class="close-modal" id="closeSelectRequestModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <p>Please select a request from the list to use this feature.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="warningModalOverlay">
+        <div class="modal">
+            <div class="modal-content warning-modal-content">
+                <div class="warning-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <div class="form-group">
-                    <label for="replayBody">Body:</label>
-                    <textarea id="replayBody" class="form-control" rows="10" placeholder="Raw request body"></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn-primary" id="sendReplayBtn">Replay</button>
-                    <button class="btn btn-secondary" id="cancelReplayBtn">Cancel</button>
+                <h3>Are you sure?</h3>
+                <p>This action will permanently delete all requests.</p>
+                <div class="warning-modal-actions">
+                    <button class="btn btn-danger" id="confirmClearBtn">Confirm</button>
+                    <button class="btn btn-secondary" id="cancelClearBtn">Cancel</button>
                 </div>
             </div>
         </div>

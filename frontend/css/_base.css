@@ -45,3 +45,13 @@ main.container { /* Target main container specifically */
     padding: 0.4rem 0.8rem;
     font-size: 0.8em;
 }
+
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn.disabled:hover {
+    background-color: transparent;
+}

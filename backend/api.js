@@ -3,6 +3,7 @@ const path = require('path');
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const { listStmt, getStmt, clearStmt, db, insertStmt } = require('./database');
+const { TARGET_HOST, TARGET_PORT } = require('./config');
 const fetch = require('node-fetch'); // For making API calls to Gemini
 const crypto = require('crypto'); // Import crypto module
 
@@ -222,10 +223,11 @@ Remember: Your entire output MUST be a valid JSON object matching the specified 
 
         console.log('AI Inspect - Prompt sent to Gemini:', prompt);
 
-        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'x-goog-api-key': GEMINI_API_KEY,
             },
             body: JSON.stringify({
                 contents: [{
@@ -340,7 +342,12 @@ app.post('/api/replay', async (req, res) => {
             replayOptions.body = requestToReplay.body;
         }
 
-        const replayResponse = await fetch(requestToReplay.url, replayOptions);
+        let targetUrl = requestToReplay.url;
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+            targetUrl = `http://${TARGET_HOST}:${TARGET_PORT}${targetUrl}`;
+        }
+
+        const replayResponse = await fetch(targetUrl, replayOptions);
 
         // Capture response details for logging
         const resHeaders = {};

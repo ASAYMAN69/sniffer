@@ -88,3 +88,8 @@ header {
     background: #dc2626;
     transform: translateY(-2px);
 }
+
+header > .container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
