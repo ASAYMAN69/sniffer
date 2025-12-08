@@ -177,6 +177,18 @@ function createProxyServer(wss, inspectorWss) {
         proxyWss.handleUpgrade(req, socket, head, (clientWs) => {
             const result = insertWsConnectionStmt.run(req.url, 'active', new Date().toISOString());
             const connectionId = result.lastInsertRowid;
+            const newSession = {
+                id: connectionId,
+                url: req.url,
+                status: 'active',
+                start_time: new Date().toISOString(),
+                type: 'ws_session_new' // Event type for frontend
+            };
+            inspectorWss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify(newSession));
+                }
+            });
 
             const targetWsUrl = `ws://${TARGET_HOST}:${TARGET_PORT}${req.url}`;
             const targetWs = new WebSocket(targetWsUrl, {
@@ -220,7 +232,19 @@ function createProxyServer(wss, inspectorWss) {
             });
 
             clientWs.on('close', (code, reason) => {
-                updateWsConnectionStmt.run('closed', new Date().toISOString(), connectionId);
+                const closeTime = new Date().toISOString();
+                updateWsConnectionStmt.run('closed', closeTime, connectionId);
+                const updatedSession = {
+                    id: connectionId,
+                    status: 'closed',
+                    end_time: closeTime,
+                    type: 'ws_session_update' // Event type for frontend
+                };
+                inspectorWss.clients.forEach(client => {
+                    if (client.readyState === WebSocket.OPEN) {
+                        client.send(JSON.stringify(updatedSession));
+                    }
+                });
                 targetWs.close(code, reason.toString());
             });
 
