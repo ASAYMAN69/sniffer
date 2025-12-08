@@ -1,0 +1,37 @@
+/* Warning Modal Styles */
+.warning-modal-icon {
+    font-size: 4rem;
+    color: var(--danger);
+    margin-bottom: 1.5rem;
+    animation: vibrate 0.5s ease-in-out;
+}
+
+@keyframes vibrate {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+.warning-modal-content {
+    text-align: center;
+}
+
+.warning-modal-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.warning-modal-content p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.warning-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}

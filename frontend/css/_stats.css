@@ -1,0 +1,199 @@
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2x2 grid for cards */
+    gap: 1.5rem;
+    margin-bottom: 0; /* Managed by parent flex/grid gap */
+}
+
+.stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem; /* Reduced padding */
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    /* aspect-ratio: 1 / 1; */ /* Removed aspect ratio */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribute content */
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--primary);
+}
+
+.stat-card.requests::before {
+    background: var(--primary);
+}
+
+.stat-card.methods::before {
+    background: linear-gradient(0deg, var(--primary), var(--secondary));
+}
+
+.stat-card.status::before {
+    background: var(--secondary);
+}
+
+.stat-card.performance::before {
+    background: var(--warning);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Changed from flex-start to center */
+    margin-bottom: 0.5rem; /* Reduced margin */
+}
+
+.stat-icon {
+    width: 40px; /* Reduced size */
+    height: 40px; /* Reduced size */
+    border-radius: 10px; /* Reduced border radius */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem; /* Reduced font size */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.requests .stat-icon {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--primary);
+}
+
+.methods .stat-icon {
+    background: rgba(124, 58, 237, 0.15);
+    color: var(--primary-dark);
+}
+
+.status .stat-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--secondary);
+}
+
+.performance .stat-icon {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+}
+
+.stat-title {
+    font-size: 0.8rem; /* Reduced font size */
+    opacity: 0.8;
+    margin-bottom: 0.2rem; /* Reduced margin */
+}
+
+.stat-value {
+    font-size: 1.5rem; /* Reduced font size */
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.stat-change.positive {
+    color: var(--success);
+}
+
+.stat-change.negative {
+    color: var(--danger);
+}
+
+/* New Layout for Stats Modal Content */
+.stats-layout-wrapper {
+    display: grid;
+    grid-template-columns: minmax(400px, 1fr) minmax(400px, 1fr); /* Two columns: min 400px, flexible */
+    gap: 2rem;
+    align-items: start; /* Align content to the top */
+    height: 100%; /* Ensure it takes full height of modal-content */
+}
+
+.stats-left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    height: 100%; /* Take full height of grid cell */
+}
+
+.stats-right-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Take full height of grid cell */
+}
+
+.chart-card {
+    flex-shrink: 0; /* Prevent charts from shrinking excessively */
+}
+
+.visualization-piechart {
+    flex-grow: 1; /* Pie chart takes remaining space in left column */
+    display: flex;
+    flex-direction: column;
+}
+
+.visualization-piechart .chart-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.visualization-piechart #statusChartModal {
+    max-height: 100%; /* Ensure chart scales within container */
+    max-width: 100%;
+}
+
+.visualization-bargraph {
+    flex-grow: 1; /* Bar graph takes all space in right column */
+    display: flex;
+    flex-direction: column;
+}
+
+.visualization-bargraph .chart-container {
+    flex-grow: 1;
+}
+
+.visualization-bargraph #responseTimeChartModal {
+    max-height: 100%; /* Ensure chart scales within container */
+    max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) { /* Adjust breakpoint as needed */
+    .stats-layout-wrapper {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+    }
+    .stats-left-section,
+    .stats-right-section {
+        height: auto; /* Reset height for stacked layout */
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr; /* Stack cards on very small screens */
+    }
+    .stat-card {
+        aspect-ratio: auto; /* Remove aspect ratio for smaller cards if stacking */
+    }
+}

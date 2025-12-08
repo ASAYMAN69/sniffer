@@ -1,0 +1,305 @@
+/* Custom styles for AI Analysis Modal */
+.ai-analysis-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Base styles from example.html, adapted to existing variables */
+body {
+    /* Background and font family are already defined in _base.css */
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Header and subtitle styles are specific to example.html's main page and not directly for the modal */
+
+/* Modal Styles - adapted from example.html */
+.modal-overlay#aiAnalysisNewModalOverlay { /* Target specifically the new AI modal */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay for emphasis */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal { /* Target specifically the new AI modal */
+    background: var(--card-bg); /* Use existing card background variable */
+    width: 100%;
+    max-width: 800px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg); /* Use existing shadow variable */
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: var(--transition);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow: visible; /* Ensure it allows content overflow for scrolling */
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay.active .modal {
+    transform: translateY(0);
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-header {
+    background: linear-gradient(90deg, var(--primary), var(--secondary)); /* Use existing primary/secondary */
+    color: var(--text-light); /* Use light text for gradient header */
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    z-index: 10;
+    position: relative;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .close-modal {
+    background: none;
+    border: none;
+    color: var(--text-light); /* Use light text for close button */
+    font-size: 1.8rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .close-modal:hover {
+    background: rgba(255, 255, 255, 0.2); /* White with transparency */
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-body {
+    padding: 0;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content {
+    padding: 40px;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(90vh - 120px); /* Header height + footer potential space */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--light-border); /* Use existing primary and light-border */
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-track {
+    background: var(--light-border); /* Use existing light-border */
+    border-radius: 10px;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-thumb {
+    background: var(--primary); /* Use existing primary */
+    border-radius: 10px;
+}
+
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark); /* Use existing primary-dark */
+}
+
+/* Loading Animation Styles - adapted from example.html */
+.loading-container {
+    text-align: center;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-text {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: var(--primary-dark); /* Use existing primary-dark */
+    min-height: 32px;
+}
+
+.blinking-text {
+    animation: blink 2.5s infinite;
+    font-weight: 700;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.dot {
+    width: 14px;
+    height: 14px;
+    background: var(--primary); /* Use existing primary */
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+.dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.progress-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 30px auto;
+    background: var(--light-border); /* Use existing light-border */
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary); /* Use existing primary */
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--text-color); /* Use existing text color */
+}
+
+/* Results Container & Card Styles - adapted from example.html */
+.results-container {
+    display: none;
+    width: 100%;
+    perspective: 1000px;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.card {
+    background: var(--card-bg); /* Use existing card background */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow); /* Use existing shadow */
+    padding: 25px;
+    text-align: left;
+    transform: translateX(-100px) rotateY(-10deg);
+    opacity: 0;
+    transition: var(--transition);
+    border-top: 4px solid var(--primary); /* Use existing primary */
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary)); /* Use existing primary/secondary */
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease;
+}
+
+.card.active {
+    transform: translateX(0) rotateY(0);
+    opacity: 1;
+}
+
+.card.active::before {
+    transform: scaleX(1);
+}
+
+.card.security { border-top-color: var(--danger); }
+.card.insights { border-top-color: var(--secondary); }
+.card.performance { border-top-color: var(--success); }
+.card.recommendations { border-top-color: var(--warning); }
+
+.card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: var(--primary); /* Use existing primary */
+}
+
+.card.security .card-icon { color: var(--danger); }
+.card.insights .card-icon { color: var(--secondary); }
+.card.performance .card-icon { color: var(--success); }
+.card.recommendations .card-icon { color: var(--warning); }
+
+.card-title {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.card-content {
+    color: var(--text-color); /* Use existing text color */
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+/* Media Queries - adapted from example.html */
+@media (max-width: 768px) {
+    .modal-overlay#aiAnalysisNewModalOverlay .modal-content {
+        padding: 25px 20px;
+        max-height: calc(90vh - 100px);
+    }
+    
+    .modal-overlay#aiAnalysisNewModalOverlay .modal-header {
+        padding: 15px 20px;
+    }
+}

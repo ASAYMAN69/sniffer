@@ -1,0 +1,135 @@
+/* Requests Table */
+.table-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure it fills the available height in the grid */
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+}
+
+thead {
+    background: rgba(139, 92, 246, 0.08);
+}
+
+th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-color);
+    opacity: 0.85;
+}
+
+tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+tr:last-child {
+    border-bottom: none;
+}
+
+td {
+    padding: 1rem 1.5rem;
+    font-size: 0.9375rem;
+    vertical-align: middle;
+}
+
+.status-code {
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.status-2xx {
+    color: var(--success);
+}
+
+.status-3xx {
+    color: var(--warning);
+}
+
+.status-4xx {
+    color: #f97316;
+}
+
+.status-5xx {
+    color: var(--danger);
+}
+
+.duration {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+.duration.fast {
+    color: var(--success);
+}
+
+.duration.medium {
+    color: var(--warning);
+}
+
+.duration.slow {
+    color: var(--danger);
+}
+
+.request-row:hover {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.request-row:hover td:first-child::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.request-row.pinned {
+    background-color: rgba(139, 92, 246, 0.2); /* A light purple background */
+    border-left: 5px solid var(--primary); /* A solid bar on the left */
+    font-weight: 600; /* Make text bolder */
+    /* Ensure pinned row stays at top visual layer */
+    position: relative;
+    z-index: 10;
+}
+
+.request-row.pinned:hover {
+    background-color: rgba(139, 92, 246, 0.25); /* Slightly darker on hover */
+}
+
+.request-row.replayed {
+    border-right: 5px solid var(--warning); /* Example style */
+    opacity: 0.8;
+}
+
+.table-responsive {
+    overflow-x: auto; /* Allow horizontal scrolling for tables */
+    -webkit-overflow-scrolling: touch;
+    flex-grow: 1; /* Allow to fill available space */
+    overflow-y: auto; /* Allow vertical scrolling for tables */
+    height: 0; /* Important for flex-grow to work with overflow */
+}
