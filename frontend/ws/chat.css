@@ -1,76 +1,130 @@
-.chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
+/* ===== VERTICAL CHAT LAYOUT (Bubble Style) ===== */
 
 .chat-messages {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Allow vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
     padding: 20px;
-    background-color: var(--background-color-secondary);
+    background-color: var(--background-color-secondary); /* Assuming this is a variable, check if needs to be card-bg or similar */
     border-radius: 8px;
+    display: flex; /* Make it a flex container */
+    flex-direction: column; /* Stack messages vertically */
+    gap: 10px; /* Space between messages */
 }
 
+/* Message bubble styling */
 .message {
-    margin-bottom: 15px;
     display: flex;
-    flex-direction: column;
-}
-
-.message .content {
-    padding: 10px 15px;
-    border-radius: 18px;
-    max-width: 80%;
+    flex-direction: column; /* Stack header and content vertically */
+    max-width: 80%; /* Limit bubble width */
     word-wrap: break-word;
-}
-
-.message .timestamp {
-    font-size: 0.75em;
-    color: var(--text-color-secondary);
-    margin-top: 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for bubble effect */
+    transition: none; /* Remove hover animation if not desired for bubbles */
+    padding: 10px 12px; /* Adjusted padding for bubble-like appearance */
+    border-radius: 18px; /* Rounded corners for bubble */
 }
 
 .message.client {
-    align-items: flex-end;
-}
-
-.message.client .content {
-    background-color: #007bff;
+    align-self: flex-end; /* Align the entire bubble to the right */
+    background-color: var(--primary); /* Client bubble color */
     color: white;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 4px; /* Adjust for corner */
 }
 
 .message.server {
-    align-items: flex-start;
-}
-
-.message.server .content {
-    background-color: var(--subtle-bg);
+    align-self: flex-start; /* Align the entire bubble to the left */
+    background-color: var(--subtle-bg); /* Server bubble color */
     color: var(--text-color);
-    border: 1px solid var(--border-color);
-    border-bottom-left-radius: 4px;
+    border: 1px solid var(--border-color); /* Keep subtle border for server */
+    border-bottom-left-radius: 4px; /* Adjust for corner */
 }
 
-.request-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* Message header (direction + timestamp) */
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px; /* Space between header and content */
+    padding-bottom: 5px; /* Padding below header */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Lighter separator for dark theme */
+    color: var(--text-color-secondary);
+}
+/* Ensure header border is themed correctly for server/client */
+.message.server .message-header {
+    border-bottom-color: var(--border-color-light); /* Themed separator for server */
+}
+.message.client .message-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2); /* Lighter separator for client */
 }
 
-.request-list-item {
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.request-list-item:hover {
-    background-color: var(--background-color-secondary);
-}
-
-.request-list-item.active {
-    background-color: #007bff;
-    color: white;
+.direction-badge {
+    font-size: 0.7em;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px; /* Smaller padding for badge */
+    border-radius: 8px; /* Slightly less rounded */
+}
+
+.message.client .direction-badge {
+    background-color: rgba(255, 255, 255, 0.2); /* Lighter badge for client */
+    color: white;
+}
+
+.message.server .direction-badge {
+    background-color: var(--border-color); /* Themed badge for server */
+    color: var(--text-color);
+}
+
+/* Message content */
+.message .content {
+    flex-grow: 1;
+    padding: 0; /* No internal padding here, already on message */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+    max-width: 100%;
+    overflow-y: auto;
+    max-height: 150px; /* Reduced max-height for bubble content */
+    background-color: transparent; /* Ensure content background is transparent */
+}
+
+/* Message timestamp */
+.message .timestamp {
+    font-size: 0.7em;
+    color: var(--text-color-secondary);
+    margin-top: 5px; /* Space below content */
+    padding-top: 0;
+    border-top: none; /* No separator here */
+    text-align: right; /* Default align to right */
+    opacity: 0.8;
+}
+
+.message.server .timestamp {
+    text-align: left; /* Align server timestamp to left */
+}
+
+/* General button styling adjustments for chat */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+.btn-secondary {
+    background: var(--subtle-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+/* Empty state adjustments */
+#wsConversationEmptyState {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    background-color: var(--background-color-secondary); /* Assuming this is a variable, check if needs to be card-bg or similar */
+    border-radius: 8px;
 }

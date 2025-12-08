@@ -7,15 +7,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Re-use existing CSS -->
-    <link rel="stylesheet" href="../css/_variables.css">
-    <link rel="stylesheet" href="../css/_base.css">
-    <link rel="stylesheet" href="../css/_header.css">
-    <link rel="stylesheet" href="../css/_dashboard.css">
-    <link rel="stylesheet" href="../css/_toggles.css">
-    <link rel="stylesheet" href="../css/_responsive.css">
+    <link rel="stylesheet" href="css/_variables.css">
+    <link rel="stylesheet" href="css/_base.css">
+    <link rel="stylesheet" href="css/_header.css">
+    <link rel="stylesheet" href="css/_dashboard.css">
+    <link rel="stylesheet" href="css/_toggles.css">
+    <link rel="stylesheet" href="css/_responsive.css">
+    <link rel="stylesheet" href="css/_modal.css">
+    <link rel="stylesheet" href="css/_empty-state.css"> <!-- Added missing empty state CSS -->
+    <link rel="stylesheet" href="css/_warning-modal.css"> <!-- Added missing warning modal CSS -->
+    <link rel="stylesheet" href="css/_table.css"> <!-- Added missing table CSS -->
+    <link rel="stylesheet" href="css/_animations.css"> <!-- Added missing animations CSS -->
     <!-- New chat CSS -->
-    <link rel="stylesheet" href="chat.css">
-    <link rel="stylesheet" href="../css/_switch.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="css/_switch.css">
 </head>
 <body class="light ws-page">
     <header>
@@ -72,7 +77,7 @@
         </div>
     </header>
 
-    <main class="container" style="display: grid; grid-template-columns: 400px 1fr; gap: 20px; height: calc(100vh - 80px - 2rem); padding: 2rem 0;">
+    <main class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: calc(100vh - 80px - 2rem); padding: 2rem 0;">
         <div class="table-container" style="display: flex; flex-direction: column;">
             <div class="table-header">
                 <div class="table-title">WebSocket Sessions</div>
@@ -92,19 +97,49 @@
                     </tbody>
                 </table>
             </div>
+            <div class="empty-state" id="wsSessionsEmptyState" style="display: block;">
+                <div class="empty-icon">
+                    <i class="fas fa-filter"></i>
+                </div>
+                <div class="empty-title">No WebSocket sessions recorded</div>
+                <div class="empty-message">Start proxying WebSocket traffic to see sessions here.</div>
+            </div>
         </div>
 
         <div class="table-container chat-container">
             <div class="table-header">
                 <div class="table-title" id="chatHeader">Select a request</div>
             </div>
-            <div class="chat-messages" id="chatMessages">
+            <div class="empty-state" id="wsConversationEmptyState" style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; text-align: center;">
+                <div class="empty-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="empty-title">No session selected</div>
+                <div class="empty-message">Click a WebSocket session on the left to view its conversation.</div>
+            </div>
+            <div class="chat-messages" id="chatMessages" style="display: none;">
                 <!-- Chat messages will be populated by JavaScript -->
             </div>
         </div>
     </main>
 
     <script src="../js/theme.js"></script>
-    <script type="module" src="ws-main.js"></script>
+    <script type="module" src="js/ws-main.js"></script>
+
+    <div class="modal-overlay" id="warningModalOverlay">
+        <div class="modal">
+            <div class="modal-content warning-modal-content">
+                <div class="warning-modal-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Are you sure?</h3>
+                <p>This action will permanently delete all WebSocket sessions and messages.</p>
+                <div class="warning-modal-actions">
+                    <button class="btn btn-danger" id="confirmClearBtn">Confirm</button>
+                    <button class="btn btn-secondary" id="cancelClearBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

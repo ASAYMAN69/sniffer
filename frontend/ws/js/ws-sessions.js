@@ -2,6 +2,7 @@ import { fetchAndRenderWsMessages, chatHeader, chatMessages } from './ws-message
 export let activeConnectionId = null;
 
 const wsSessionsTableBody = document.getElementById('wsSessionsTableBody');
+const wsSessionsEmptyState = document.getElementById('wsSessionsEmptyState'); // New reference
 
 export async function fetchWsSessions() {
     try {
@@ -16,9 +17,13 @@ export async function fetchWsSessions() {
 export function renderWsSessions(sessions) {
     wsSessionsTableBody.innerHTML = ''; // Clear existing rows
     if (sessions.length === 0) {
-        wsSessionsTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No WebSocket sessions recorded.</td></tr>';
+        wsSessionsEmptyState.style.display = 'block'; // Show empty state
+        wsSessionsTableBody.style.display = 'none'; // Hide table body
         return;
     }
+
+    wsSessionsEmptyState.style.display = 'none'; // Hide empty state
+    wsSessionsTableBody.style.display = 'table-row-group'; // Show table body
 
     sessions.forEach(session => {
         const tr = document.createElement('tr');
@@ -47,6 +52,12 @@ export function renderWsSessions(sessions) {
 }
 
 export function addWsSessionToTable(newSession) {
+    if (wsSessionsEmptyState.style.display === 'block') {
+        wsSessionsEmptyState.style.display = 'none'; // Hide empty state
+        wsSessionsTableBody.style.display = 'table-row-group'; // Show table body
+        wsSessionsTableBody.innerHTML = ''; // Clear "No sessions recorded" row if present
+    }
+
     const tr = document.createElement('tr');
     tr.className = 'request-row';
     tr.dataset.connectionId = newSession.id;
@@ -74,6 +85,7 @@ export function addWsSessionToTable(newSession) {
             tr.click();
     }
 }
+
 
 export function updateWsSessionInTable(updatedSession) {
     const row = wsSessionsTableBody.querySelector(`[data-connection-id="${updatedSession.id}"]`);

@@ -2,8 +2,23 @@ import { activeConnectionId } from './ws-sessions.js';
 
 export const chatMessages = document.getElementById('chatMessages');
 export const chatHeader = document.getElementById('chatHeader');
+const wsConversationEmptyState = document.getElementById('wsConversationEmptyState'); // New reference
+
+export function showEmptyConversationState() {
+    wsConversationEmptyState.style.display = 'flex';
+    chatMessages.style.display = 'none';
+    chatHeader.textContent = 'Select a request';
+}
 
 export async function fetchAndRenderWsMessages(connectionId, connectionUrl) {
+    if (!connectionId) {
+        showEmptyConversationState();
+        return;
+    }
+
+    wsConversationEmptyState.style.display = 'none'; // Hide "Click a session" empty state
+    chatMessages.style.display = 'flex'; // Show chat messages container
+
     try {
         const response = await fetch(`/api/websocket/sessions/${connectionId}/messages`);
         const messages = await response.json();
@@ -20,7 +35,7 @@ export function renderWsMessages(messages, connectionUrl) {
     chatMessages.innerHTML = '';
 
     if (messages.length === 0) {
-        chatMessages.innerHTML = `<div class="message info">No messages for this session yet.</div>`;
+        chatMessages.innerHTML = `<div id="noMessagesYet" class="message info">No messages for this session yet.</div>`;
         return;
     }
 
@@ -53,6 +68,16 @@ export function renderWsMessages(messages, connectionUrl) {
 
 export function addWsMessageToChat(message) {
     if (message.connectionId === activeConnectionId) {
+        // Hide "Click a session" empty state if it's visible
+        wsConversationEmptyState.style.display = 'none';
+        chatMessages.style.display = 'flex';
+
+        // Hide "No messages for this session yet." if it exists
+        const noMessagesYetEl = document.getElementById('noMessagesYet');
+        if (noMessagesYetEl) {
+            noMessagesYetEl.remove();
+        }
+
         const messageEl = document.createElement('div');
         messageEl.className = `message ${message.direction === 'client_to_server' ? 'client' : 'server'}`;
 

@@ -110,8 +110,8 @@ WHERE connection_id = ?
 ORDER BY timestamp ASC
 `);
 
-const clearWsConnectionsStmt = db.prepare(`DELETE FROM websocket_connections`);
-const clearWsMessagesStmt = db.prepare(`DELETE FROM websocket_messages`);
+const clearWsConnectionsStmt = db.prepare(`DELETE FROM websocket_connections WHERE status = 'closed'`);
+const clearWsMessagesStmt = db.prepare(`DELETE FROM websocket_messages WHERE connection_id IN (SELECT id FROM websocket_connections WHERE status = 'closed')`);
 
 module.exports = {
     db,

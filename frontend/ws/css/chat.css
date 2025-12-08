@@ -1,0 +1,116 @@
+/* Chat Container */
+.chat-container {
+    background: var(--card-bg); /* Use card background for consistency */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow); /* Use existing shadow variable */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensure content respects border-radius */
+}
+
+/* Chat Messages Area */
+.chat-messages {
+    flex-grow: 1; /* Allow messages to take available space */
+    overflow-y: auto; /* Enable scrolling for messages */
+    padding: 1rem;
+    display: flex; /* Flex container for messages */
+    flex-direction: column; /* Stack messages vertically */
+    gap: 0.5rem; /* Space between messages */
+    scroll-behavior: smooth; /* Smooth scrolling when new messages arrive */
+}
+
+/* Individual Message Styling */
+.message {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%; /* Limit message width */
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius);
+    word-wrap: break-word; /* Ensure long words break */
+    white-space: pre-wrap; /* Preserve whitespace and wrap */
+    box-shadow: var(--shadow-sm); /* Subtle shadow for messages */
+    font-size: 0.95rem;
+}
+
+.message.client {
+    align-self: flex-end; /* Align client messages to the right */
+    background-color: var(--primary-light); /* Light primary background for client */
+    color: var(--primary-dark); /* Dark primary text for client */
+    border-bottom-right-radius: 4px; /* Slightly different corner for visual distinction */
+}
+
+.message.server {
+    align-self: flex-start; /* Align server messages to the left */
+    background-color: var(--bg-accent); /* Accent background for server */
+    color: var(--text-color); /* Default text color for server */
+    border-bottom-left-radius: 4px; /* Slightly different corner for visual distinction */
+}
+
+.message .content {
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+}
+
+.message .content pre {
+    margin: 0; /* Remove default pre margin */
+    padding: 1rem 1.25rem; /* Increased padding to make the box bigger */
+    background-color: var(--primary); /* Set background to primary purple */
+    color: var(--text-light); /* Set text color to white for contrast */
+    border: 1px solid var(--border-color); /* Add a border matching theme */
+    border-radius: var(--border-radius); /* Apply border-radius for consistency */
+    font-family: var(--font-mono); /* Monospace font for code/JSON */
+    font-size: 0.9rem; /* Slightly increased font size */
+    white-space: pre-wrap;
+    word-break: break-all; /* Break long strings */
+    overflow-x: auto; /* Enable horizontal scrolling for long lines */
+}
+
+.message.server .content pre {
+    background-color: var(--subtle-bg); /* Gray background for server messages */
+}
+
+/* Remove specific client/server pre styles as background is now uniform */
+/* .message.client .content pre {
+    background-color: var(--primary-light);
+    color: var(--text-light);
+}
+
+.message.server .content pre {
+    background-color: var(--bg-accent);
+    color: var(--text-light);
+} */
+
+
+.message .timestamp {
+    font-size: 0.75rem;
+    color: var(--text-light); /* Lighter color for timestamp */
+    align-self: flex-end; /* Align timestamp to the right within the message bubble */
+    margin-top: 0.2rem;
+}
+
+/* Info and Error Message Styling */
+.message.info {
+    background-color: var(--bg-accent);
+    color: var(--text-color);
+    align-self: center;
+    text-align: center;
+    width: 100%;
+    max-width: fit-content;
+    padding: 0.5rem 1rem;
+    font-style: italic;
+    font-size: 0.9rem;
+    box-shadow: none;
+}
+
+.message.error {
+    background-color: var(--danger-light);
+    color: var(--danger-dark);
+    align-self: center;
+    text-align: center;
+    width: 100%;
+    max-width: fit-content;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: none;
+}
