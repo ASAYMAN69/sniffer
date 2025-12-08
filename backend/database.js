@@ -110,6 +110,9 @@ WHERE connection_id = ?
 ORDER BY timestamp ASC
 `);
 
+const clearWsConnectionsStmt = db.prepare(`DELETE FROM websocket_connections`);
+const clearWsMessagesStmt = db.prepare(`DELETE FROM websocket_messages`);
+
 module.exports = {
     db,
     insertStmt,
@@ -120,5 +123,7 @@ module.exports = {
     updateWsConnectionStmt,
     insertWsMessageStmt,
     listWsConnectionsStmt,
-    listWsMessagesStmt
+    listWsMessagesStmt,
+    clearWsConnectionsStmt,
+    clearWsMessagesStmt
 };

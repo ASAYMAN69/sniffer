@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const { WebSocketServer } = require('ws');
-const { listStmt, getStmt, clearStmt, db, insertStmt, listWsConnectionsStmt, listWsMessagesStmt } = require('./database');
+const { listStmt, getStmt, clearStmt, db, insertStmt, listWsConnectionsStmt, listWsMessagesStmt, clearWsConnectionsStmt, clearWsMessagesStmt } = require('./database');
 const { TARGET_HOST, TARGET_PORT } = require('./config');
 const fetch = require('node-fetch'); // For making API calls to Gemini
 const crypto = require('crypto'); // Import crypto module
@@ -136,6 +136,19 @@ app.post('/api/clear', (req, res) => {
         clearStmt.run();
         res.json({ ok: true });
     } catch (err) {
+        res.status(500).json({ ok: false, error: String(err) });
+    }
+});
+
+app.post('/api/websocket/clear', (req, res) => {
+    try {
+        db.transaction(() => {
+            clearWsMessagesStmt.run();
+            clearWsConnectionsStmt.run();
+        })();
+        res.json({ ok: true });
+    } catch (err) {
+        console.error('Error clearing WebSocket data:', err);
         res.status(500).json({ ok: false, error: String(err) });
     }
 });

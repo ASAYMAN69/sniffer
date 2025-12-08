@@ -8,8 +8,24 @@ const statsToggleBtn = document.getElementById('statsToggleBtn');
 
 // Disable or adapt buttons for real data
 if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-        alert('Clearing all WebSocket sessions is not yet implemented.');
+    clearBtn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to clear all WebSocket sessions and messages?')) {
+            try {
+                const response = await fetch('/api/websocket/clear', { method: 'POST' });
+                if (response.ok) {
+                    // Clear UI
+                    fetchWsSessions(); // Re-fetch to show empty list
+                    chatMessages.innerHTML = ''; // Clear chat messages
+                    chatHeader.textContent = 'Select a request';
+                } else {
+                    console.error('Failed to clear WebSocket data:', response.statusText);
+                    alert('Failed to clear WebSocket data.');
+                }
+            } catch (error) {
+                console.error('Error clearing WebSocket data:', error);
+                alert('Error clearing WebSocket data.');
+            }
+        }
     });
 }
 
