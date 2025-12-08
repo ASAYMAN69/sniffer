@@ -7,6 +7,8 @@ const db = new Database(DATABASE_FILE);
 // This is a destructive operation and will result in data loss.
 // For a production environment, a proper migration strategy should be used.
 db.exec('DROP TABLE IF EXISTS requests');
+db.exec('DROP TABLE IF EXISTS websocket_messages');
+db.exec('DROP TABLE IF EXISTS websocket_connections');
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS requests (
@@ -30,6 +32,29 @@ CREATE TABLE IF NOT EXISTS requests (
   replayed INTEGER DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_startedAt ON requests(startedAt DESC);
+`);
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS websocket_connections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  url TEXT,
+  status TEXT,
+  start_time DATETIME,
+  end_time DATETIME
+);
+CREATE INDEX IF NOT EXISTS idx_ws_connection_start_time ON websocket_connections(start_time DESC);
+`);
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS websocket_messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  connection_id INTEGER,
+  direction TEXT,
+  content TEXT,
+  timestamp DATETIME,
+  FOREIGN KEY(connection_id) REFERENCES websocket_connections(id)
+);
+CREATE INDEX IF NOT EXISTS idx_ws_message_timestamp ON websocket_messages(timestamp DESC);
 `);
 
 const insertStmt = db.prepare(`
@@ -58,10 +83,42 @@ LIMIT ?
 const getStmt = db.prepare(`SELECT * FROM requests WHERE id = ?`);
 const clearStmt = db.prepare(`DELETE FROM requests`);
 
+const insertWsConnectionStmt = db.prepare(`
+INSERT INTO websocket_connections (url, status, start_time)
+VALUES (?, ?, ?)
+`);
+
+const updateWsConnectionStmt = db.prepare(`
+UPDATE websocket_connections
+SET status = ?, end_time = ?
+WHERE id = ?
+`);
+
+const insertWsMessageStmt = db.prepare(`
+INSERT INTO websocket_messages (connection_id, direction, content, timestamp)
+VALUES (?, ?, ?, ?)
+`);
+
+const listWsConnectionsStmt = db.prepare(`
+SELECT * FROM websocket_connections
+ORDER BY start_time DESC
+`);
+
+const listWsMessagesStmt = db.prepare(`
+SELECT * FROM websocket_messages
+WHERE connection_id = ?
+ORDER BY timestamp ASC
+`);
+
 module.exports = {
     db,
     insertStmt,
     listStmt,
     getStmt,
-    clearStmt
+    clearStmt,
+    insertWsConnectionStmt,
+    updateWsConnectionStmt,
+    insertWsMessageStmt,
+    listWsConnectionsStmt,
+    listWsMessagesStmt
 };

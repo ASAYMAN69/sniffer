@@ -1,111 +1,95 @@
 
 
-// Mock Data
-const mockConversations = {
-    "req-1": {
-        name: "Login Attempt",
-        url: "/api/login", // Added URL for display
-        time: "10:01:00 AM", // Added time for display
-        conversation: [
-            { from: "client", data: { type: "auth_request", username: "user1", password: "password123" }, timestamp: "10:01:01 AM" },
-            { from: "server", data: { type: "auth_response", status: "success", token: "xyz-abc" }, timestamp: "10:01:02 AM" },
-            { from: "client", data: { type: "get_profile", token: "xyz-abc" }, timestamp: "10:01:03 AM" },
-            { from: "server", data: { type: "profile_data", user: { id: 1, name: "User One", email: "user1@example.com" } }, timestamp: "10:01:04 AM" },
-            { from: "client", data: { type: "get_settings" }, timestamp: "10:01:05 AM" },
-            { from: "server", data: { type: "settings_data", settings: { theme: "dark", notifications: true } }, timestamp: "10:01:06 AM" },
-            { from: "client", data: { type: "update_settings", settings: { notifications: false } }, timestamp: "10:01:07 AM" },
-            { from: "server", data: { type: "update_ack", status: "success" }, timestamp: "10:01:08 AM" },
-            { from: "client", data: { type: "logout" }, timestamp: "10:01:09 AM" },
-            { from: "server", data: { type: "logout_success" }, timestamp: "10:01:10 AM" },
-        ]
-    },
-    "req-2": {
-        name: "Data Fetch",
-        url: "/data/products", // Added URL for display
-        time: "10:02:00 AM", // Added time for display
-        conversation: [
-            { from: "client", data: { action: "fetch", resource: "products" }, timestamp: "10:02:01 AM" },
-            { from: "server", data: { status: "pending", message: "Fetching product list..." }, timestamp: "10:02:02 AM" },
-            { from: "server", data: { status: "success", products: [{ id: 101, name: "Laptop" }, { id: 102, name: "Mouse" }] }, timestamp: "10:02:03 AM" },
-            { from: "client", data: { action: "fetch_details", productId: 101 }, timestamp: "10:02:04 AM" },
-            { from: "server", data: { status: "success", product: { id: 101, name: "Laptop", price: 1200, stock: 50 } }, timestamp: "10:02:05 AM" },
-            { from: "client", data: { action: "fetch_details", productId: 102 }, timestamp: "10:02:06 AM" },
-            { from: "server", data: { status: "success", product: { id: 102, name: "Mouse", price: 25, stock: 200 } }, timestamp: "10:02:07 AM" },
-            { from: "client", data: { action: "subscribe_updates", productId: 101 }, timestamp: "10:02:08 AM" },
-            { from: "server", data: { status: "subscribed", message: "You are now subscribed to updates for Laptop" }, timestamp: "10:02:09 AM" },
-            { from: "server", data: { type: "stock_update", productId: 101, new_stock: 49 }, timestamp: "10:02:15 AM" },
-        ]
-    },
-    "req-3": {
-        name: "Live Chat",
-        url: "/chat/room123", // Added URL for display
-        time: "10:03:00 AM", // Added time for display
-        conversation: [
-            { from: "client", data: { event: "join_room", room: "support" }, timestamp: "10:03:01 AM" },
-            { from: "server", data: { event: "user_joined", user: "You" }, timestamp: "10:03:02 AM" },
-            { from: "server", data: { event: "user_joined", user: "SupportAgent" }, timestamp: "10:03:03 AM" },
-            { from: "client", data: { event: "message", text: "Hello, I have an issue with my order." }, timestamp: "10:03:05 AM" },
-            { from: "server", data: { event: "message", from: "SupportAgent", text: "Hello! How can I help you today?" }, timestamp: "10:03:08 AM" },
-            { from: "client", data: { event: "message", text: "My order #12345 has not arrived." }, timestamp: "10:03:12 AM" },
-            { from: "server", data: { event: "typing", from: "SupportAgent" }, timestamp: "10:03:13 AM" },
-            { from: "server", data: { event: "message", from: "SupportAgent", text: "Let me check that for you." }, timestamp: "10:03:15 AM" },
-            { from: "client", data: { event: "leave_room", room: "support" }, timestamp: "10:04:00 AM" },
-            { from: "server", data: { event: "user_left", user: "You" }, timestamp: "10:04:01 AM" },
-        ]
-    }
-};
 
-const requestTableBody = document.getElementById('requestTableBody'); // Changed ID
+
+const wsSessionsTableBody = document.getElementById('wsSessionsTableBody');
 const chatMessages = document.getElementById('chatMessages');
 const chatHeader = document.getElementById('chatHeader');
-let activeRequestId = null;
+let activeConnectionId = null;
 
-function renderRequestList() {
-    requestTableBody.innerHTML = ''; // Changed ID
-    for (const requestId in mockConversations) {
-        const request = mockConversations[requestId];
-        
-        const tr = document.createElement('tr');
-        tr.className = 'request-row'; // Reusing existing table row styles
-        tr.dataset.requestId = requestId;
-
-        tr.innerHTML = `
-            <td class="time-duration-combined-col">${request.time}</td>
-            <td class="url-col truncate">${request.url}</td>
-        `;
-
-        tr.addEventListener('click', () => {
-            if (activeRequestId) {
-                const oldActive = requestTableBody.querySelector(`[data-request-id="${activeRequestId}"]`);
-                if(oldActive) oldActive.classList.remove('active');
-            }
-            activeRequestId = requestId;
-            tr.classList.add('active'); // Add active class to the tr
-            renderConversation(requestId);
-        });
-
-        requestTableBody.appendChild(tr); // Changed ID
+async function fetchWsSessions() {
+    try {
+        const response = await fetch('/api/websocket/sessions');
+        const sessions = await response.json();
+        renderWsSessions(sessions);
+    } catch (error) {
+        console.error('Error fetching WebSocket sessions:', error);
     }
 }
 
-function renderConversation(requestId) {
-    const request = mockConversations[requestId];
-    if (!request) return;
+function renderWsSessions(sessions) {
+    wsSessionsTableBody.innerHTML = ''; // Clear existing rows
+    if (sessions.length === 0) {
+        wsSessionsTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No WebSocket sessions recorded.</td></tr>';
+        return;
+    }
 
-    chatHeader.textContent = request.name;
+    sessions.forEach(session => {
+        const tr = document.createElement('tr');
+        tr.className = 'request-row';
+        tr.dataset.connectionId = session.id;
+
+        tr.innerHTML = `
+            <td>${session.id}</td>
+            <td class="url-col truncate">${session.url}</td>
+            <td><span class="status-badge status-${session.status}">${session.status}</span></td>
+            <td>${new Date(session.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
+        `;
+
+        tr.addEventListener('click', () => {
+            if (activeConnectionId) {
+                const oldActive = wsSessionsTableBody.querySelector(`[data-connection-id="${activeConnectionId}"]`);
+                if(oldActive) oldActive.classList.remove('active');
+            }
+            activeConnectionId = session.id;
+            tr.classList.add('active');
+            fetchAndRenderWsMessages(session.id, session.url); // New function to implement
+        });
+
+        wsSessionsTableBody.appendChild(tr);
+    });
+}
+
+
+async function fetchAndRenderWsMessages(connectionId, connectionUrl) {
+    try {
+        const response = await fetch(`/api/websocket/sessions/${connectionId}/messages`);
+        const messages = await response.json();
+        renderWsMessages(messages, connectionUrl);
+    } catch (error) {
+        console.error('Error fetching WebSocket messages:', error);
+        chatHeader.textContent = `Error loading messages for ${connectionUrl}`;
+        chatMessages.innerHTML = `<div class="message error">Error loading messages.</div>`;
+    }
+}
+
+function renderWsMessages(messages, connectionUrl) {
+    chatHeader.textContent = `Conversation for: ${connectionUrl}`;
     chatMessages.innerHTML = '';
 
-    request.conversation.forEach(msg => {
+    if (messages.length === 0) {
+        chatMessages.innerHTML = `<div class="message info">No messages for this session yet.</div>`;
+        return;
+    }
+
+    messages.forEach(msg => {
         const messageEl = document.createElement('div');
-        messageEl.className = `message ${msg.from}`;
+        messageEl.className = `message ${msg.direction === 'client_to_server' ? 'client' : 'server'}`;
 
         const contentEl = document.createElement('div');
         contentEl.className = 'content';
-        contentEl.innerHTML = `<pre>${JSON.stringify(msg.data, null, 2)}</pre>`; // Render JSON in pre tags
+        try {
+            // Try to pretty print JSON if possible
+            const parsedContent = JSON.parse(msg.content);
+            contentEl.innerHTML = `<pre>${JSON.stringify(parsedContent, null, 2)}</pre>`;
+        } catch (e) {
+            // Otherwise, display as plain text
+            contentEl.innerHTML = `<pre>${msg.content}</pre>`;
+        }
 
         const timestampEl = document.createElement('div');
         timestampEl.className = 'timestamp';
-        timestampEl.textContent = msg.timestamp;
+        timestampEl.textContent = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         messageEl.appendChild(contentEl);
         messageEl.appendChild(timestampEl);
@@ -115,62 +99,31 @@ function renderConversation(requestId) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// DOM elements for new buttons
+// DOM elements for buttons
 const clearBtn = document.getElementById('clearBtn');
 const newReqBtn = document.getElementById('newReqBtn');
 const statsToggleBtn = document.getElementById('statsToggleBtn');
 
-// Dummy implementation for these buttons
+// Disable or adapt buttons for real data
 if (clearBtn) {
     clearBtn.addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear all mock requests?')) {
-            for (const key in mockConversations) {
-                delete mockConversations[key];
-            }
-            activeRequestId = null;
-            renderRequestList();
-            chatHeader.textContent = 'Select a request';
-            chatMessages.innerHTML = '';
-            alert('All mock requests cleared!');
-        }
+        alert('Clearing all WebSocket sessions is not yet implemented.');
     });
 }
 
 if (newReqBtn) {
     newReqBtn.addEventListener('click', () => {
-        const newId = `req-${Object.keys(mockConversations).length + 1}`;
-        const newReqName = prompt('Enter name for new mock request:', `New Request ${Object.keys(mockConversations).length + 1}`);
-        if (newReqName) {
-            mockConversations[newId] = {
-                name: newReqName,
-                url: `/mock/path/${newId}`,
-                time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                conversation: [
-                    { from: "client", data: { message: "Hello, new mock request!" }, timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) },
-                    { from: "server", data: { message: "Welcome to the mock server!" }, timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) },
-                ]
-            };
-            renderRequestList();
-            // Re-render the chat window if a request is selected
-            if (activeRequestId) {
-                renderConversation(activeRequestId);
-            }
-            alert(`New mock request "${newReqName}" added.`);
-        }
+        alert('Creating new WebSocket requests is not applicable here.');
     });
 }
 
 if (statsToggleBtn) {
     statsToggleBtn.addEventListener('click', () => {
-        alert('Statistics for mock WebSocket data is not available.');
+        alert('Statistics for WebSocket data is not available on this page.');
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderRequestList();
-    // Select the first request by default
-    const firstRequest = requestTableBody.querySelector('.request-row');
-    if (firstRequest) {
-        firstRequest.click();
-    }
+    fetchWsSessions();
 });
+

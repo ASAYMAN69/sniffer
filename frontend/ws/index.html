@@ -75,18 +75,20 @@
     <main class="container" style="display: grid; grid-template-columns: 400px 1fr; gap: 20px; height: calc(100vh - 80px - 2rem); padding: 2rem 0;">
         <div class="table-container" style="display: flex; flex-direction: column;">
             <div class="table-header">
-                <div class="table-title">Requests</div>
+                <div class="table-title">WebSocket Sessions</div>
             </div>
             <div class="table-responsive" style="flex-grow: 1; overflow-y: auto;">
-                <table id="requestTable" style="width: 100%; border-collapse: collapse;">
+                <table id="wsSessionsTable" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
-                            <th>Time</th>
+                            <th>ID</th>
                             <th>URL</th>
+                            <th>Status</th>
+                            <th>Time</th>
                         </tr>
                     </thead>
-                    <tbody id="requestTableBody">
-                        <!-- Request items will be populated by JavaScript -->
+                    <tbody id="wsSessionsTableBody">
+                        <!-- WebSocket Session items will be populated by JavaScript -->
                     </tbody>
                 </table>
             </div>

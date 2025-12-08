@@ -110,3 +110,53 @@ export function connectWebSocket() {
         ws.close(); // Close to trigger onclose and reconnection attempt
     };
 }
+
+export function connectInspectorWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/ws/inspector`;
+
+    const inspectorWs = new WebSocket(wsUrl);
+
+    inspectorWs.onopen = () => {
+        console.log('Inspector WebSocket connected');
+    };
+
+    inspectorWs.onmessage = (event) => {
+        if (getIsPaused()) return; // Skip update if paused
+        const receivedData = JSON.parse(event.data);
+        console.log('Received Inspector WebSocket message:', receivedData);
+
+        if (receivedData.type === 'ws_message') {
+            const newRequestData = {
+                id: receivedData.timestamp, // Use timestamp for a unique enough ID for the row
+                method: 'WS',
+                url: `[${receivedData.connectionId}] ${receivedData.direction}`,
+                status: '',
+                time: new Date(receivedData.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                duration: '',
+                replayed: 0,
+                isWs: true,
+                ...receivedData
+            };
+
+            allRequests.unshift(newRequestData);
+            if (allRequests.length > 1000) {
+                allRequests.length = 1000;
+            }
+            
+            applyFilters();
+            updateStatCards();
+        }
+    };
+
+    inspectorWs.onclose = (event) => {
+        console.log('Inspector WebSocket disconnected:', event.reason);
+        setTimeout(connectInspectorWebSocket, 5000); // Try to reconnect every 5 seconds
+    };
+
+    inspectorWs.onerror = (error) => {
+        console.error('Inspector WebSocket error:', error);
+        inspectorWs.close();
+    };
+}

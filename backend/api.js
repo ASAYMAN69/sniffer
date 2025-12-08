@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const { WebSocketServer } = require('ws');
-const { listStmt, getStmt, clearStmt, db, insertStmt } = require('./database');
+const { listStmt, getStmt, clearStmt, db, insertStmt, listWsConnectionsStmt, listWsMessagesStmt } = require('./database');
 const { TARGET_HOST, TARGET_PORT } = require('./config');
 const fetch = require('node-fetch'); // For making API calls to Gemini
 const crypto = require('crypto'); // Import crypto module
@@ -18,7 +18,21 @@ function genId() {
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ noServer: true });
+const inspectorWss = new WebSocketServer({ noServer: true });
+
+server.on('upgrade', (req, socket, head) => {
+    const pathname = req.url;
+    if (pathname === '/ws/inspector') {
+        inspectorWss.handleUpgrade(req, socket, head, (ws) => {
+            inspectorWss.emit('connection', ws, req);
+        });
+    } else {
+        wss.handleUpgrade(req, socket, head, (ws) => {
+            wss.emit('connection', ws, req);
+        });
+    }
+});
 
 app.use(express.json({ limit: '5mb' }));
 
@@ -70,6 +84,27 @@ app.get('/api/search', (req, res) => {
         res.status(500).json({ ok: false, error: String(err) });
     }
 });
+
+app.get('/api/websocket/sessions', (req, res) => {
+    try {
+        const rows = listWsConnectionsStmt.all();
+        res.json(rows);
+    } catch (err) {
+        console.error('List WS connections API error:', err);
+        res.status(500).json({ ok: false, error: String(err) });
+    }
+});
+
+app.get('/api/websocket/sessions/:id/messages', (req, res) => {
+    try {
+        const rows = listWsMessagesStmt.all(req.params.id);
+        res.json(rows);
+    } catch (err) {
+        console.error('List WS messages API error:', err);
+        res.status(500).json({ ok: false, error: String(err) });
+    }
+});
+
 
 app.get('/api/requests/:id', (req, res) => {
     const id = req.params.id;
@@ -411,4 +446,4 @@ app.post('/api/replay', async (req, res) => {
     }
 });
 
-module.exports = { server, wss };
+module.exports = { server, wss, inspectorWss };

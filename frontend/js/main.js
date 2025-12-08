@@ -1,5 +1,5 @@
 import { fetchInitialRequests, applyFilters, pinnedRequestId, setPinnedRequestId, allRequests } from './requests.js';
-import { connectWebSocket } from './websocket.js';
+import { connectWebSocket, connectInspectorWebSocket } from './websocket.js';
 import { initModals } from './modals.js';
 import { showEmptyState } from './packet-details.js';
 import { updateStatCards } from './stats.js';
@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchInitialRequests(); // Fetch initial requests on load
     applyFilters(); // Apply filters immediately to render table
     connectWebSocket(); // Establish WebSocket connection
+    connectInspectorWebSocket(); // Establish Inspector WebSocket connection
     initModals(); // Initialize all modal-related event listeners
     showEmptyState(); // Show empty state on load
 });

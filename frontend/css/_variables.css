@@ -34,6 +34,8 @@
     --subtle-bg: var(--dark-card);
     --subtle-bg-rgb: var(--card-bg-rgb);
     --view-switch-bg: var(--dark-border);
+    --ws-row-bg: rgba(96, 165, 250, 0.1); /* Blue-ish tint for dark theme WS rows */
+    --ws-row-hover-bg: rgba(96, 165, 250, 0.2);
 }
 
 .light {
@@ -47,4 +49,6 @@
     --subtle-bg: var(--light-card);
     --subtle-bg-rgb: var(--card-bg-rgb);
     --view-switch-bg: var(--light-border);
+    --ws-row-bg: rgba(96, 165, 250, 0.05); /* Lighter blue-ish tint for light theme WS rows */
+    --ws-row-hover-bg: rgba(96, 165, 250, 0.1);
 }

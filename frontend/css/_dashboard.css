@@ -228,6 +228,37 @@ main {
 .request-method.POST { background-color: #3B82F6; } /* Blue */
 .request-method.PUT { background-color: #8B5CF6; } /* Violet */
 .request-method.DELETE { background-color: #EF4444; } /* Red */
+.request-method.WS { background-color: #60A5FA; /* Blue for WS */ }
+
+/* Styling for WebSocket message rows */
+.request-row.ws-message {
+    background-color: var(--ws-row-bg); /* Define this in _variables.css or here */
+}
+.request-row.ws-message:hover {
+    background-color: var(--ws-row-hover-bg); /* Define this in _variables.css or here */
+}
+
+/* Status badge for WebSocket sessions */
+.status-badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    font-size: 0.75em;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    border-radius: 0.25rem;
+    color: white; /* Default text color */
+}
+
+.status-badge.status-active {
+    background-color: #28a745; /* Green */
+}
+
+.status-badge.status-closed {
+    background-color: #dc3545; /* Red */
+}
 
 .status-code {
     font-size: 0.75rem;

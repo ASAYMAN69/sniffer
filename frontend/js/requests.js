@@ -1,4 +1,4 @@
-import { showPacketDetails } from './packet-details.js';
+import { showPacketDetails, showWsMessageDetails } from './packet-details.js';
 
 // Live data
 export let allRequests = []; // This will hold all requests, updated via API fetch and WebSockets
@@ -90,11 +90,20 @@ function renderTable(requests) {
             if (pinnedRequest.replayed) { // Add class for replayed requests
                 tr.classList.add('replayed');
             }
-            tr.innerHTML = `
-                <td class="time-duration-combined-col">${pinnedRequest.time} - ${pinnedRequest.duration}</td>
-                <td class="method-status-col"><span class="request-method ${pinnedRequest.method}">${pinnedRequest.method}</span><br><span class="status-code status-${pinnedRequest.status.startsWith('2') ? '2xx' : pinnedRequest.status.startsWith('3') ? '3xx' : pinnedRequest.status.startsWith('4') ? '4xx' : '5xx'}">${pinnedRequest.status}</span></td>
-                <td class="url-col truncate">${pinnedRequest.url}</td>
-            `;
+            if (pinnedRequest.isWs) {
+                tr.classList.add('ws-message');
+                tr.innerHTML = `
+                    <td class="time-duration-combined-col">${pinnedRequest.time}</td>
+                    <td class="method-status-col"><span class="request-method WS">WS</span></td>
+                    <td class="url-col truncate">${pinnedRequest.url}</td>
+                `;
+            } else {
+                tr.innerHTML = `
+                    <td class="time-duration-combined-col">${pinnedRequest.time} - ${pinnedRequest.duration}</td>
+                    <td class="method-status-col"><span class="request-method ${pinnedRequest.method}">${pinnedRequest.method}</span><br><span class="status-code status-${pinnedRequest.status.startsWith('2') ? '2xx' : pinnedRequest.status.startsWith('3') ? '3xx' : pinnedRequest.status.startsWith('4') ? '4xx' : '5xx'}">${pinnedRequest.status}</span></td>
+                    <td class="url-col truncate">${pinnedRequest.url}</td>
+                `;
+            }
             tr.addEventListener('click', (event) => {
                 // Prevent default Ctrl+click behavior (opening in new tab)
                 if (event.ctrlKey) {
@@ -127,11 +136,20 @@ function renderTable(requests) {
             if (request.replayed) { // Add class for replayed requests
                 tr.classList.add('replayed');
             }
-            tr.innerHTML = `
-                <td class="time-duration-combined-col">${request.time} - ${request.duration}</td>
-                <td class="method-status-col"><span class="request-method ${request.method}">${request.method}</span><br><span class="status-code status-${request.status.startsWith('2') ? '2xx' : request.status.startsWith('3') ? '3xx' : request.status.startsWith('4') ? '4xx' : '5xx'}">${request.status}</span></td>
-                <td class="url-col truncate">${request.url}</td>
-            `;
+            if (request.isWs) {
+                tr.classList.add('ws-message');
+                tr.innerHTML = `
+                    <td class="time-duration-combined-col">${request.time}</td>
+                    <td class="method-status-col"><span class="request-method WS">WS</span></td>
+                    <td class="url-col truncate">${request.url}</td>
+                `;
+            } else {
+                tr.innerHTML = `
+                    <td class="time-duration-combined-col">${request.time} - ${request.duration}</td>
+                    <td class="method-status-col"><span class="request-method ${request.method}">${request.method}</span><br><span class="status-code status-${request.status.startsWith('2') ? '2xx' : request.status.startsWith('3') ? '3xx' : request.status.startsWith('4') ? '4xx' : '5xx'}">${request.status}</span></td>
+                    <td class="url-col truncate">${request.url}</td>
+                `;
+            }
             
             tr.addEventListener('click', (event) => {
                 // Prevent default Ctrl+click behavior (opening in new tab)
@@ -141,7 +159,11 @@ function renderTable(requests) {
                 // If a non-pinned request is clicked, pin it and unpin previous one
                 pinnedRequestId = request.id;
                 applyFilters(); // Re-render to reflect new pinning
-                showPacketDetails(request.id); // Also show details for newly pinned request
+                if (request.isWs) {
+                    showWsMessageDetails(request);
+                } else {
+                    showPacketDetails(request.id);
+                }
             });
             
             requestsTableBody.appendChild(tr);

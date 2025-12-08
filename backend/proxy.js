@@ -1,6 +1,6 @@
 const http = require('http');
 const crypto = require('crypto');
-const { insertStmt } = require('./database');
+const { insertStmt, insertWsConnectionStmt, updateWsConnectionStmt, insertWsMessageStmt } = require('./database');
 const { TARGET_HOST, TARGET_PORT, MAX_BODY_BYTES } = require('./config');
 const { WebSocket, WebSocketServer } = require('ws');
 
@@ -49,7 +49,7 @@ function processAndStoreBody(bodyBuf, fullContentType) {
 }
 
 
-function createProxyServer(wss) {
+function createProxyServer(wss, inspectorWss) {
     const server = http.createServer(async (clientReq, clientRes) => {
         const id = genId();
         const startedAt = Date.now();
@@ -175,6 +175,9 @@ function createProxyServer(wss) {
 
     server.on('upgrade', (req, socket, head) => {
         proxyWss.handleUpgrade(req, socket, head, (clientWs) => {
+            const result = insertWsConnectionStmt.run(req.url, 'active', new Date().toISOString());
+            const connectionId = result.lastInsertRowid;
+
             const targetWsUrl = `ws://${TARGET_HOST}:${TARGET_PORT}${req.url}`;
             const targetWs = new WebSocket(targetWsUrl, {
                 headers: req.headers
@@ -182,15 +185,42 @@ function createProxyServer(wss) {
 
             targetWs.on('open', () => {
                 clientWs.on('message', (message, isBinary) => {
+                    const timestamp = new Date().toISOString();
+                    const content = isBinary ? message.toString('hex') : message.toString('utf8');
+                    const direction = 'client_to_server';
+                    insertWsMessageStmt.run(connectionId, direction, content, timestamp);
+
+                    const wsEvent = { type: 'ws_message', connectionId, direction, content, timestamp };
+                    const wsEventString = JSON.stringify(wsEvent);
+                    inspectorWss.clients.forEach(client => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(wsEventString);
+                        }
+                    });
+
                     targetWs.send(message, { binary: isBinary });
                 });
 
                 targetWs.on('message', (message, isBinary) => {
+                    const timestamp = new Date().toISOString();
+                    const content = isBinary ? message.toString('hex') : message.toString('utf8');
+                    const direction = 'server_to_client';
+                    insertWsMessageStmt.run(connectionId, direction, content, timestamp);
+                    
+                    const wsEvent = { type: 'ws_message', connectionId, direction, content, timestamp };
+                    const wsEventString = JSON.stringify(wsEvent);
+                    inspectorWss.clients.forEach(client => {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(wsEventString);
+                        }
+                    });
+
                     clientWs.send(message, { binary: isBinary });
                 });
             });
 
             clientWs.on('close', (code, reason) => {
+                updateWsConnectionStmt.run('closed', new Date().toISOString(), connectionId);
                 targetWs.close(code, reason.toString());
             });
 

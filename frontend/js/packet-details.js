@@ -274,7 +274,37 @@ function downloadResponseBody(content, contentType) {
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    export function showWsMessageDetails(request) {
+        document.getElementById('emptyStateContainer').style.display = 'none';
+        document.getElementById('packetInspectionMessage').style.display = 'none';
+        document.getElementById('packetDetails').style.display = 'grid';
+    
+        // Hide HTTP-specific fields
+        document.getElementById('packetResStatusLine').textContent = '';
+        document.getElementById('packetReqHeaders').textContent = '';
+        document.getElementById('packetResHeaders').textContent = '';
+        document.getElementById('packetEndedAt').textContent = '';
+        document.getElementById('packetDuration').textContent = '';
+        document.getElementById('packetReqSize').textContent = '';
+        document.getElementById('packetResSize').textContent = '';
+    
+        // Show WS-specific info
+        document.getElementById('packetId').textContent = `WS Msg [${request.connectionId}]`;
+        document.getElementById('packetStartedAt').textContent = new Date(request.timestamp).toLocaleString();
+        
+        const reqBodyElement = document.getElementById('packetReqBody');
+        reqBodyElement.innerHTML = '';
+        const pre = document.createElement('pre');
+        pre.className = 'detail-content';
+        pre.textContent = request.content;
+        reqBodyElement.appendChild(pre);
+    
+        const resBodyElement = document.getElementById('packetResBody');
+        resBodyElement.innerHTML = '<pre class="detail-content">N/A</pre>';
+    }
+    
