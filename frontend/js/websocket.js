@@ -127,27 +127,10 @@ export function connectInspectorWebSocket() {
         const receivedData = JSON.parse(event.data);
         console.log('Received Inspector WebSocket message:', receivedData);
 
-        if (receivedData.type === 'ws_message') {
-            const newRequestData = {
-                id: receivedData.timestamp, // Use timestamp for a unique enough ID for the row
-                method: 'WS',
-                url: `[${receivedData.connectionId}] ${receivedData.direction}`,
-                status: '',
-                time: new Date(receivedData.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                duration: '',
-                replayed: 0,
-                isWs: true,
-                ...receivedData
-            };
+        // If you need to handle other types of messages for the API dashboard in the future,
+        // you would add new `if/else if` blocks here.
+        // As per user request, WS messages should not appear on the API monitor.
 
-            allRequests.unshift(newRequestData);
-            if (allRequests.length > 1000) {
-                allRequests.length = 1000;
-            }
-            
-            applyFilters();
-            updateStatCards();
-        }
     };
 
     inspectorWs.onclose = (event) => {
