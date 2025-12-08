@@ -16,7 +16,7 @@ Sniffer is a real-time API traffic monitoring dashboard that provides insights i
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ASAYMAN69/sniffer.git
 cd sniffer
 ```
 
