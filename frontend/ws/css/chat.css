@@ -84,8 +84,31 @@
 .message .timestamp {
     font-size: 0.75rem;
     color: var(--text-light); /* Lighter color for timestamp */
-    align-self: flex-end; /* Align timestamp to the right within the message bubble */
+    /* Removed align-self: flex-end; as parent message-footer will handle alignment */
     margin-top: 0.2rem;
+}
+
+.message-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align items to the right */
+    gap: 0.5rem; /* Space between timestamp and button */
+    margin-top: 0.5rem; /* Space between content and footer */
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    padding: 0.2rem; /* Add some padding for easier clicking */
+}
+
+.copy-btn:hover {
+    opacity: 1;
 }
 
 /* Info and Error Message Styling */

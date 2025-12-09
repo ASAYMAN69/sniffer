@@ -3,7 +3,7 @@ const path = require('path');
 const http = require('http');
 const { WebSocketServer } = require('ws');
 const { listStmt, getStmt, clearStmt, db, insertStmt, listWsConnectionsStmt, listWsMessagesStmt, clearWsConnectionsStmt, clearWsMessagesStmt } = require('./database');
-const { TARGET_HOST, TARGET_PORT } = require('./config');
+const { TARGET_HOST, TARGET_PORT, mimeToExtension } = require('./config');
 const fetch = require('node-fetch'); // For making API calls to Gemini
 const crypto = require('crypto'); // Import crypto module
 
@@ -151,6 +151,43 @@ app.post('/api/websocket/clear', (req, res) => {
         console.error('Error clearing WebSocket data:', err);
         res.status(500).json({ ok: false, error: String(err) });
     }
+});
+
+// New endpoint for downloading request/response bodies
+app.get('/api/requests/:id/download/:type', (req, res) => {
+    const id = req.params.id;
+    const type = req.params.type; // 'request' or 'response'
+
+    const row = getStmt.get(id);
+    if (!row) return res.status(404).send({ error: 'Request not found' });
+
+    let bodyBuffer;
+    let contentType;
+    let filenamePrefix;
+
+    if (type === 'request') {
+        bodyBuffer = row.req_body;
+        contentType = row.req_content_type;
+        filenamePrefix = 'request_body';
+    } else if (type === 'response') {
+        bodyBuffer = row.res_body;
+        contentType = row.res_content_type;
+        filenamePrefix = 'response_body';
+    } else {
+        return res.status(400).send({ error: 'Invalid download type. Must be "request" or "response".' });
+    }
+
+    if (!bodyBuffer) {
+        return res.status(404).send({ error: `No ${type} body found for request ID ${id}` });
+    }
+
+    // Determine filename extension
+    const fileExtension = mimeToExtension(contentType);
+    const filename = `${filenamePrefix}_${id}.${fileExtension}`;
+
+    res.setHeader('Content-Type', contentType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(bodyBuffer);
 });
 
 function isBinaryContentType(contentType) {

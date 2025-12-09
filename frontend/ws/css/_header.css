@@ -6,7 +6,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    padding: 0.5rem 0; /* Reduced padding */
+    padding: 1.25rem 0; /* Increased padding for more height */
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -19,14 +19,14 @@ header {
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem; /* Increased gap */
     font-weight: 700;
-    font-size: 1.25rem; /* Reduced font size */
+    font-size: 1.5rem; /* Increased font size */
     color: var(--primary);
 }
 
 .logo .logo-icon {
-    height: 1.5rem; /* Reduced height */
+    height: 2rem; /* Increased height */
     width: auto; /* Maintain aspect ratio */
 }
 
@@ -40,16 +40,14 @@ header {
 .controls {
     display: flex;
     align-items: center;
-    gap: 0.75rem; /* Reduced gap */
+    gap: 1rem; /* Increased gap */
 }
-
-
 
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.4rem 1rem; /* Reduced padding */
+    padding: 0.6rem 1.2rem; /* Increased padding */
     border-radius: var(--border-radius);
     font-weight: 500;
     cursor: pointer;

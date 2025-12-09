@@ -7,6 +7,7 @@ let currentRawReqHeaders = ''; // To store the original raw request headers
 let currentRawResHeaders = ''; // To store the original raw response headers
 let currentReqContentType = ''; // To store the content type of the current request body
 let currentResContentType = ''; // To store the content type of the current response body
+let boundSaveResBodyHandler = null; // To store the bound event listener for saveResBodyBtn
 
 
 // Load Beautifier preference on page load
@@ -141,10 +142,14 @@ function displayBodyContent(elementId, rawContent, fullContentType, isBeautifyCh
     const category = getContentTypeCategory(fullContentType);
 
     if (category === 'binary') {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'detail-content binary-content-wrapper';
+
         const p = document.createElement('p');
-        p.className = 'detail-content binary-placeholder';
-        p.textContent = `Binary content (${fullContentType || 'unknown type'}). Use 'Save' to download.`;
-        element.appendChild(p);
+        p.textContent = `Binary content (${fullContentType || 'unknown type'}). Click the download button above to retrieve.`; // Updated text
+        wrapper.appendChild(p);
+        
+        element.appendChild(wrapper);
         return;
     }
 
@@ -156,6 +161,73 @@ function displayBodyContent(elementId, rawContent, fullContentType, isBeautifyCh
     element.appendChild(pre);
 }
 
+// New helper function to initiate download from backend
+function initiateBodyDownload(requestId, type, contentType) {
+    if (!requestId || !type) {
+        console.error('Missing requestId or type for download.');
+        return;
+    }
+    const downloadUrl = `/api/requests/${requestId}/download/${type}`;
+    window.location.href = downloadUrl;
+}
+
+// Helper function to copy text to clipboard
+async function copyContentToClipboard(content) {
+    try {
+        await navigator.clipboard.writeText(content);
+        console.log('Content copied to clipboard!');
+    } catch (err) {
+        console.error('Failed to copy content:', err);
+        alert('Failed to copy content to clipboard.');
+    }
+}
+
+// Helper to map MIME type to a common file extension (moved to top-level)
+function mimeToExtension(mimeType) {
+    if (!mimeType) return 'bin'; // Default to generic binary
+
+    const type = mimeType.toLowerCase();
+    if (type.includes('json')) return 'json';
+    if (type.includes('html')) return 'html';
+    if (type.includes('css')) return 'css';
+    if (type.includes('javascript')) return 'js';
+    if (type.includes('image/jpeg')) return 'jpg';
+    if (type.includes('image/png')) return 'png';
+    if (type.includes('image/gif')) return 'gif';
+    if (type.includes('image/svg+xml')) return 'svg';
+    if (type.includes('application/pdf')) return 'pdf';
+    if (type.includes('audio/mpeg')) return 'mp3';
+    if (type.includes('audio/wav')) return 'wav';
+    if (type.includes('video/mp4')) return 'mp4';
+    if (type.includes('video/webm')) return 'webm';
+    if (type.includes('text/plain')) return 'txt';
+    if (type.includes('xml')) return 'xml';
+    
+    // Generic fallback if no specific match
+    const parts = type.split('/');
+    if (parts.length > 1) {
+        // Use the subtype if it's not too generic (e.g., 'image' from 'image/jpeg')
+        const subType = parts[1];
+        if (subType !== 'octet-stream' && subType !== 'x-') return subType;
+    }
+    return 'bin'; // Fallback to generic binary
+}
+
+// Function to download response body (moved to top-level)
+function downloadResponseBody(content, contentType) {
+    const filename = `response_body.${mimeToExtension(contentType)}`;
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// --- EXPORTED FUNCTIONS ---
 export function showEmptyState() {
     document.getElementById('emptyStateContainer').style.display = 'flex';
     document.getElementById('packetDetails').style.display = 'none';
@@ -205,6 +277,43 @@ export async function showPacketDetails(requestId) {
         currentReqContentType = data.req_content_type || ''; // Store full content type
         currentResContentType = data.res_content_type || ''; // Store full content type
 
+        // --- Dynamic Save/Copy/Download Button Logic ---
+        const saveResBodyBtn = document.getElementById('saveResBodyBtn');
+        const saveResBodyIcon = document.getElementById('saveResBodyIcon');
+        const resBodyCategory = getContentTypeCategory(currentResContentType);
+
+        if (saveResBodyBtn && saveResBodyIcon) {
+            saveResBodyBtn.style.display = 'inline-flex'; // Always show the button
+            // Remove previous event listeners to prevent multiple bindings
+            if (boundSaveResBodyHandler) { // Check if handler exists before removing
+                saveResBodyBtn.removeEventListener('click', boundSaveResBodyHandler);
+            }
+            
+            if (resBodyCategory === 'binary') {
+                saveResBodyIcon.className = 'fas fa-download';
+                // Bind new handler for download
+                boundSaveResBodyHandler = () => initiateBodyDownload(currentPacketRequestId, 'response', currentResContentType);
+            } else {
+                saveResBodyIcon.className = 'fas fa-copy';
+                // Bind new handler for copy
+                boundSaveResBodyHandler = async () => {
+                    if (currentRawResBody !== null) {
+                        await copyContentToClipboard(currentRawResBody);
+                        // Provide visual feedback for copy
+                        const originalIconClass = saveResBodyIcon.className;
+                        saveResBodyIcon.className = 'fas fa-check';
+                        setTimeout(() => saveResBodyIcon.className = originalIconClass, 2000);
+                    } else {
+                        alert('No response body to copy.');
+                    }
+                };
+            }
+            saveResBodyBtn.addEventListener('click', boundSaveResBodyHandler);
+        } else if (saveResBodyBtn) {
+            saveResBodyBtn.style.display = 'none'; // Hide if icon container is missing
+        }
+        // --- End Dynamic Button Logic ---
+
         // Initial display with beautification if toggle is on
         const isBeautifyChecked = jsonBeautifyToggle.checked;
 
@@ -224,62 +333,8 @@ export async function showPacketDetails(requestId) {
         document.getElementById('packetDetails').style.display = 'none';
     }
 }
-
-const saveResBodyBtn = document.getElementById('saveResBodyBtn');
-if (saveResBodyBtn) {
-    saveResBodyBtn.addEventListener('click', () => {
-        if (currentPacketRequestId && currentRawResBody !== null) {
-            downloadResponseBody(currentRawResBody, currentResContentType);
-        } else {
-            alert('No response body to save.');
-        }
-    });
-}
-
-function mimeToExtension(mimeType) {
-    if (!mimeType) return 'bin'; // Default to generic binary
-
-    const type = mimeType.toLowerCase();
-    if (type.includes('json')) return 'json';
-    if (type.includes('html')) return 'html';
-    if (type.includes('css')) return 'css';
-    if (type.includes('javascript')) return 'js';
-    if (type.includes('image/jpeg')) return 'jpg';
-    if (type.includes('image/png')) return 'png';
-    if (type.includes('image/gif')) return 'gif';
-    if (type.includes('image/svg+xml')) return 'svg';
-    if (type.includes('application/pdf')) return 'pdf';
-    if (type.includes('audio/mpeg')) return 'mp3';
-    if (type.includes('audio/wav')) return 'wav';
-    if (type.includes('video/mp4')) return 'mp4';
-    if (type.includes('video/webm')) return 'webm';
-    if (type.includes('text/plain')) return 'txt';
-    if (type.includes('xml')) return 'xml';
     
-    // Generic fallback if no specific match
-    const parts = type.split('/');
-    if (parts.length > 1) {
-        // Use the subtype if it's not too generic (e.g., 'image' from 'image/jpeg')
-        const subType = parts[1];
-        if (subType !== 'octet-stream' && subType !== 'x-') return subType;
-    }
-    return 'bin'; // Fallback to generic binary
-}
-
-function downloadResponseBody(content, contentType) {
-    const filename = `response_body.${mimeToExtension(contentType)}`;
-    const blob = new Blob([content], { type: contentType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-    
-    export function showWsMessageDetails(request) {
+export function showWsMessageDetails(request) {
         document.getElementById('emptyStateContainer').style.display = 'none';
         document.getElementById('packetInspectionMessage').style.display = 'none';
         document.getElementById('packetDetails').style.display = 'grid';
@@ -307,4 +362,3 @@ function downloadResponseBody(content, contentType) {
         const resBodyElement = document.getElementById('packetResBody');
         resBodyElement.innerHTML = '<pre class="detail-content">N/A</pre>';
     }
-    

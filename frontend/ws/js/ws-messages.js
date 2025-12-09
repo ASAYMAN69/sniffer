@@ -59,7 +59,40 @@ export function renderWsMessages(messages, connectionUrl) {
         timestampEl.textContent = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         messageEl.appendChild(contentEl);
-        messageEl.appendChild(timestampEl);
+        
+        const messageFooter = document.createElement('div');
+        messageFooter.className = 'message-footer';
+
+        messageFooter.appendChild(timestampEl);
+
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-btn';
+        copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+        
+        // Add functionality to copy the content of the pre tag
+        copyButton.addEventListener('click', async (e) => {
+            e.stopPropagation(); // Prevent message click event if any
+            const preElement = messageEl.querySelector('.content pre');
+            if (preElement) {
+                try {
+                    await navigator.clipboard.writeText(preElement.textContent);
+                    // Provide visual feedback
+                    const originalIcon = copyButton.innerHTML;
+                    copyButton.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => copyButton.innerHTML = originalIcon, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    // Optionally, provide error feedback
+                    const originalIcon = copyButton.innerHTML;
+                    copyButton.innerHTML = '<i class="fas fa-times"></i>';
+                    setTimeout(() => copyButton.innerHTML = originalIcon, 2000);
+                }
+            }
+        });
+
+        messageFooter.appendChild(copyButton);
+
+        messageEl.appendChild(messageFooter);
         chatMessages.appendChild(messageEl);
     });
 
@@ -95,7 +128,40 @@ export function addWsMessageToChat(message) {
         timestampEl.textContent = new Date(message.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         messageEl.appendChild(contentEl);
-        messageEl.appendChild(timestampEl);
+        
+        const messageFooter = document.createElement('div');
+        messageFooter.className = 'message-footer';
+
+        messageFooter.appendChild(timestampEl);
+
+        const copyButton = document.createElement('button');
+        copyButton.className = 'copy-btn';
+        copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+        
+        // Add functionality to copy the content of the pre tag
+        copyButton.addEventListener('click', async (e) => {
+            e.stopPropagation(); // Prevent message click event if any
+            const preElement = messageEl.querySelector('.content pre');
+            if (preElement) {
+                try {
+                    await navigator.clipboard.writeText(preElement.textContent);
+                    // Provide visual feedback
+                    const originalIcon = copyButton.innerHTML;
+                    copyButton.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => copyButton.innerHTML = originalIcon, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    // Optionally, provide error feedback
+                    const originalIcon = copyButton.innerHTML;
+                    copyButton.innerHTML = '<i class="fas fa-times"></i>';
+                    setTimeout(() => copyButton.innerHTML = originalIcon, 2000);
+                }
+            }
+        });
+
+        messageFooter.appendChild(copyButton);
+
+        messageEl.appendChild(messageFooter);
         chatMessages.appendChild(messageEl);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
