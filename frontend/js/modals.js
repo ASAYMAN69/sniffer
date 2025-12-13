@@ -10,6 +10,10 @@ export function initModals() {
     const statsToggleBtn = document.getElementById('statsToggleBtn'); // Get the toggle button
     const selectRequestModalOverlay = document.getElementById('selectRequestModalOverlay');
     const closeSelectRequestModalBtn = document.getElementById('closeSelectRequestModal');
+    const newReqBtn = document.getElementById('newReqBtn'); // Intercept button
+    const interceptModalOverlay = document.getElementById('interceptModalOverlay');
+    const closeInterceptModal = document.getElementById('closeInterceptModal');
+    const cancelInterceptSettings = document.getElementById('cancelInterceptSettings');
 
 
     closeModalBtn.addEventListener('click', () => {
@@ -261,6 +265,26 @@ export function initModals() {
     closeReplayResultsBtn.addEventListener('click', () => {
         replayModalOverlay.classList.remove('active');
         // Optionally reset form/results state here if modal is reopened frequently
+    });
+
+    // Event listener for the new Intercept button
+    newReqBtn.addEventListener('click', () => {
+        interceptModalOverlay.classList.add('active');
+    });
+
+    // Event listeners for closing the Intercept modal
+    closeInterceptModal.addEventListener('click', () => {
+        interceptModalOverlay.classList.remove('active');
+    });
+
+    cancelInterceptSettings.addEventListener('click', () => {
+        interceptModalOverlay.classList.remove('active');
+    });
+
+    interceptModalOverlay.addEventListener('click', (e) => {
+        if (e.target === interceptModalOverlay) {
+            interceptModalOverlay.classList.remove('active');
+        }
     });
 
     closeSelectRequestModalBtn.addEventListener('click', () => {

@@ -578,6 +578,39 @@ Date: Wed, 28 Nov 2025 15:30:45 GMT</div>
         </div>
     </div>
 
+    <div class="modal-overlay" id="interceptModalOverlay">
+        <div class="modal" style="max-width: 500px; width: 90%;">
+            <div class="modal-header">
+                <h2 class="modal-title">Intercept Settings</h2>
+                <button class="close-modal" id="closeInterceptModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label for="interceptPath">Path:</label>
+                    <input type="text" id="interceptPath" class="form-control" placeholder="/api/data">
+                </div>
+                <div class="form-group">
+                    <label for="interceptOrigin">Origin:</label>
+                    <input type="text" id="interceptOrigin" class="form-control" placeholder="localhost or 127.0.0.1">
+                </div>
+                <div class="form-group">
+                    <label for="interceptMode">Intercept Mode:</label>
+                    <select id="interceptMode" class="form-control">
+                        <option value="incoming">Incoming</option>
+                        <option value="outgoing">Outgoing</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="saveInterceptSettings">Save</button>
+                    <button class="btn btn-secondary" id="cancelInterceptSettings">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="selectRequestModalOverlay">
         <div class="modal">
             <div class="modal-header">
