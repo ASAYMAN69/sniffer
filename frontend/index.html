@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="css/_switch.css">
     <link rel="stylesheet" href="css/_replay.css">
     <link rel="stylesheet" href="css/_warning-modal.css">
+    <link rel="stylesheet" href="css/_settings.css"> <!-- New settings dropdown CSS -->
 
 </head>
 <body class="light app-body">
@@ -155,12 +156,26 @@
                     <div class="packet-inspection-header">
                         <div class="table-title">Details</div>
                         <div class="packet-inspection-controls">
-                            <button class="btn btn-ai-analyze" id="aiAnalyzeBtn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 0L14.5 8.5L24 12L14.5 15.5L12 24L9.5 15.5L0 12L9.5 8.5L12 0Z" fill="currentColor"/>
-</svg></button>
-                            <button class="btn btn-primary btn-replay" id="replayBtn"><i class="fas fa-redo"></i></button>
-                            <span>Beautifier</span>
-                            <label class="switch"> <input type="checkbox" id="jsonBeautifyToggle"> </label>
+                            <!-- Settings Dropdown -->
+                                                        <div class="settings-dropdown">
+                                                            <button class="btn btn-outline" id="settingsDropdownBtn">
+                                                                <i class="fas fa-cog"></i> Settings
+                                                            </button>
+                                                            <div class="settings-dropdown-content" id="settingsDropdownContent">
+                                                                <a href="#" class="dropdown-item" id="aiAnalyzeBtn">
+                                                                    AI Analysis <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M12 0L14.5 8.5L24 12L14.5 15.5L12 24L9.5 15.5L0 12L9.5 8.5L12 0Z" fill="currentColor"/>
+                                                                    </svg>
+                                                                </a>
+                                                                <a href="#" class="dropdown-item" id="replayBtn">
+                                                                    Replay <i class="fas fa-redo"></i>
+                                                                </a>
+                                                                <div class="dropdown-item">
+                                                                    <span>Beautifier</span>
+                                                                    <label class="switch"> <input type="checkbox" id="jsonBeautifyToggle"> </label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                         </div>
                     </div>                </div>
                 <div class="modal-content" style="padding: 1rem; overflow-y: auto; flex-grow: 1;">
@@ -489,6 +504,7 @@ Date: Wed, 28 Nov 2025 15:30:45 GMT</div>
     <script type="module" src="js/modals.js"></script>
     <script type="module" src="js/stats.js"></script>
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/settings.js"></script> <!-- New settings dropdown JS -->
 
     <div class="modal-overlay" id="replayModalOverlay">
         <div class="modal" style="max-width: 900px; width: 90%;">

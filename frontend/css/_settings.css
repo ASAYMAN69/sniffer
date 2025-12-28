@@ -1,0 +1,45 @@
+.settings-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.settings-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #334155; /* Darker background */
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 8px;
+    padding: 8px 0;
+}
+
+.settings-dropdown-content a,
+.settings-dropdown-content .dropdown-item {
+    color: var(--text-color);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Aligns text to left, svg/toggle to right */
+}
+
+.settings-dropdown-content a:hover,
+.settings-dropdown-content .dropdown-item:hover {
+    background-color: var(--hover-color);
+}
+
+.show {
+    display: block;
+}
+
+.dropdown-item svg,
+.dropdown-item i { /* Also target the <i> for Replay */
+    margin-left: auto; /* Pushes the icon to the far right */
+    flex-shrink: 0; /* Prevents SVG from shrinking */
+}
+
+.dropdown-item label.switch { /* Target the Beautifier toggle */
+    margin-left: 8px; /* Add some space from the "Beautifier" text */
+}

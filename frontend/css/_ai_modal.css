@@ -1,8 +1,11 @@
 /* Custom styles for AI Analysis Modal */
 .ai-analysis-results {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* This class is not directly used for the modal layout based on index.html,
+       but if it were, it would need adjustments similar to .cards-grid */
+    display: flex; /* Changed from grid */
+    flex-direction: column; /* Stack vertically */
     gap: 1.5rem;
+    width: 100%; /* Take full width */
 }
 
 /* Base styles from example.html, adapted to existing variables */
@@ -29,7 +32,7 @@ body {
     visibility: hidden;
     transition: var(--transition);
     z-index: 1000;
-    padding: 20px;
+    padding: 0; /* Remove padding here to ensure full height */
 }
 
 .modal-overlay#aiAnalysisNewModalOverlay.active {
@@ -40,17 +43,17 @@ body {
 .modal-overlay#aiAnalysisNewModalOverlay .modal { /* Target specifically the new AI modal */
     background: var(--card-bg); /* Use existing card background variable */
     width: 100%;
-    max-width: 800px;
+    max-width: 100%; /* Allow modal to take full width of overlay */
+    height: 100%; /* Make modal take full height of overlay */
+    max-height: 100%; /* Ensure it doesn't exceed 100% */
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-lg); /* Use existing shadow variable */
-    overflow: hidden;
+    overflow: hidden; /* Prevent overflow for the modal itself */
     transform: translateY(20px);
     transition: var(--transition);
     position: relative;
     display: flex;
     flex-direction: column;
-    max-height: 90vh;
-    overflow: visible; /* Ensure it allows content overflow for scrolling */
 }
 
 .modal-overlay#aiAnalysisNewModalOverlay.active .modal {
@@ -99,37 +102,30 @@ body {
     flex: 1;
     min-height: 0;
     display: flex;
-    overflow: hidden;
+    overflow: hidden; /* Ensure modal-body itself doesn't overflow */
     position: relative;
+    height: 100%; /* Make modal-body take full height */
 }
 
 .modal-overlay#aiAnalysisNewModalOverlay .modal-content {
     padding: 40px;
     width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: calc(90vh - 120px); /* Header height + footer potential space */
+    overflow: hidden; /* Prevent any scrollbars within this section */
+    height: 100%; /* Make modal-content take full height */
     scrollbar-width: thin;
     scrollbar-color: var(--primary) var(--light-border); /* Use existing primary and light-border */
 }
 
-.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-track {
-    background: var(--light-border); /* Use existing light-border */
-    border-radius: 10px;
-}
-
+/* Remove scrollbar styles if overflow is hidden */
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar,
+.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-track,
 .modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-thumb {
-    background: var(--primary); /* Use existing primary */
-    border-radius: 10px;
+    width: 0;
+    height: 0;
+    background: transparent;
+    display: none;
 }
 
-.modal-overlay#aiAnalysisNewModalOverlay .modal-content::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-dark); /* Use existing primary-dark */
-}
 
 /* Loading Animation Styles - adapted from example.html */
 .loading-container {
@@ -218,13 +214,18 @@ body {
     display: none;
     width: 100%;
     perspective: 1000px;
+    flex: 1; /* Allow results-container to grow and take available space */
+    overflow-y: auto; /* Enable vertical scrolling for cards */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    padding-right: 15px; /* Add padding for scrollbar if needed */
 }
 
 .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex; /* Changed from grid to flex */
+    flex-direction: column; /* Stack vertically */
     gap: 25px;
     margin-top: 20px;
+    width: 100%; /* Ensure it takes full width */
 }
 
 .card {
@@ -239,6 +240,7 @@ body {
     border-top: 4px solid var(--primary); /* Use existing primary */
     position: relative;
     overflow: hidden;
+    width: 100%; /* Each card takes full width */
 }
 
 .card::before {
@@ -296,7 +298,7 @@ body {
 @media (max-width: 768px) {
     .modal-overlay#aiAnalysisNewModalOverlay .modal-content {
         padding: 25px 20px;
-        max-height: calc(90vh - 100px);
+        /* max-height: calc(90vh - 100px); This is no longer needed with full height */
     }
     
     .modal-overlay#aiAnalysisNewModalOverlay .modal-header {
