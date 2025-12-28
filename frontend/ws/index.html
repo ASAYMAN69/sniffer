@@ -34,10 +34,16 @@
                     <div class="view-switch">
                         <div class="switch-highlight"></div>
                         <a href="/" class="switch-option">API</a>
-                        <a href="/ws/index.html" class="switch-option active">WS</a>
+                        <a href="/ws" class="switch-option active">WS</a>
                     </div>
                 </div>
                 <div class="controls">
+                    <button class="btn btn-danger" id="clearBtn">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                    <button class="btn btn-outline" id="statsToggleBtn">
+                        <i class="fas fa-chart-bar"></i> Statistics
+                    </button>
                     <label class="switch" id="dark-mode-switch-label">
                         <input id="dark-mode-toggle-input" type="checkbox" />
                         <div class="slider round">
@@ -63,12 +69,6 @@
                             </div>
                         </div>
                     </label>
-                    <button class="btn btn-danger" id="clearBtn">
-                        <i class="fas fa-trash-alt"></i> Clear All
-                    </button>
-                    <button class="btn btn-outline" id="statsToggleBtn">
-                        <i class="fas fa-chart-bar"></i> Statistics
-                    </button>
                 </div>
             </div>
         </div>
