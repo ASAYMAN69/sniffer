@@ -1,299 +1,252 @@
 import { currentPacketRequestId } from './packet-details.js';
 import { renderStatsCharts } from './stats.js';
 
+// Helper function to close all modals
+function closeAllModals() {
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.getElementById('statsModalOverlay').classList.remove('active');
+    document.getElementById('aiAnalysisNewModalOverlay').classList.remove('active');
+    document.getElementById('replayModalOverlay').classList.remove('active');
+    document.getElementById('selectRequestModalOverlay').classList.remove('active');
+    document.getElementById('warningModalOverlay').classList.remove('active');
+}
+
 export function initModals() {
-    // Modal functionality
+    // General Modal elements (used for request details, though not explicitly handled in this file for opening)
     const modalOverlay = document.getElementById('modalOverlay');
     const closeModalBtn = document.getElementById('closeModal');
+
+    // Stats Modal elements
     const statsModalOverlay = document.getElementById('statsModalOverlay');
     const closeStatsModalBtn = document.getElementById('closeStatsModal');
-    const statsToggleBtn = document.getElementById('statsToggleBtn'); // Get the toggle button
+    const statsToggleBtn = document.getElementById('statsToggleBtn');
+
+    // AI Analysis Modal elements
+    const aiAnalysisNewModalOverlay = document.getElementById('aiAnalysisNewModalOverlay');
+    const closeAiAnalysisNewModal = document.getElementById('closeAiAnalysisNewModal');
+    const aiAnalyzeBtn = document.getElementById('aiAnalyzeBtn');
+
+    // Replay Modal elements
+    const replayModalOverlay = document.getElementById('replayModalOverlay');
+    const closeReplayModal = document.getElementById('closeReplayModal');
+    const replayBtn = document.getElementById('replayBtn');
+
+    // Select Request Modal elements
     const selectRequestModalOverlay = document.getElementById('selectRequestModalOverlay');
     const closeSelectRequestModalBtn = document.getElementById('closeSelectRequestModal');
-    const newReqBtn = document.getElementById('newReqBtn'); // Intercept button
-    const interceptModalOverlay = document.getElementById('interceptModalOverlay');
-    const closeInterceptModal = document.getElementById('closeInterceptModal');
-    const cancelInterceptSettings = document.getElementById('cancelInterceptSettings');
+
+    // Warning Modal elements (clear all confirmation)
+    const warningModalOverlay = document.getElementById('warningModalOverlay');
+    const cancelClearBtn = document.getElementById('cancelClearBtn');
 
 
-    closeModalBtn.addEventListener('click', () => {
-        modalOverlay.classList.remove('active');
-    });
-
+    // Event Listeners for closing modals
     modalOverlay.addEventListener('click', (e) => {
         if (e.target === modalOverlay) {
-            modalOverlay.classList.remove('active');
+            closeAllModals();
         }
     });
-
-    closeStatsModalBtn.addEventListener('click', () => {
-        statsModalOverlay.classList.remove('active');
-    });
+    closeModalBtn.addEventListener('click', closeAllModals);
 
     statsModalOverlay.addEventListener('click', (e) => {
         if (e.target === statsModalOverlay) {
-            statsModalOverlay.classList.remove('active');
+            closeAllModals();
         }
     });
+    closeStatsModalBtn.addEventListener('click', closeAllModals);
 
-    // Add event listener to open the stats modal
-    statsToggleBtn.addEventListener('click', () => {
-        statsModalOverlay.classList.add('active');
-        renderStatsCharts(); // Render charts when the modal is opened
-    });
-
-    const aiAnalysisModalOverlay = document.getElementById('aiAnalysisNewModalOverlay');
-    const openAiAnalysisModalBtn = document.getElementById('aiAnalyzeBtn');
-    const closeAiAnalysisModalBtn = document.getElementById('closeAiAnalysisNewModal');
-
-    openAiAnalysisModalBtn.addEventListener('click', async () => {
-        if (openAiAnalysisModalBtn.classList.contains('disabled')) {
-            selectRequestModalOverlay.classList.add('active');
-            return;
-        }
-
-        if (!currentPacketRequestId) {
-            alert('Please select a packet to analyze first.');
-            return;
-        }
-
-        aiAnalysisModalOverlay.classList.add('active');
-        const loadingContainer = aiAnalysisModalOverlay.querySelector('.loading-container');
-        const resultsContainer = aiAnalysisModalOverlay.querySelector('.results-container');
-        
-        // Show loading state
-        loadingContainer.style.display = 'flex';
-        resultsContainer.style.display = 'none';
-
-        try {
-            const response = await fetch(`/api/ai-inspect/${currentPacketRequestId}`);
-            const data = await response.json();
-
-            if (response.ok) {
-                document.getElementById('securityContent').innerHTML = marked.parse(data.analysis.security);
-                document.getElementById('performanceContent').innerHTML = marked.parse(data.analysis.performance);
-                document.getElementById('insightsContent').innerHTML = marked.parse(data.analysis.insights);
-                document.getElementById('recommendationsContent').innerHTML = marked.parse(data.analysis.recommendations);
-            } else {
-                throw new Error(data.error || 'Failed to fetch AI analysis.');
-            }
-        } catch (error) {
-            console.error('AI Analysis Error:', error);
-            document.getElementById('securityContent').textContent = `Error: ${error.message}`;
-            document.getElementById('performanceContent').textContent = 'Could not load analysis.';
-            document.getElementById('insightsContent').textContent = 'Could not load analysis.';
-            document.getElementById('recommendationsContent').textContent = 'Could not load analysis.';
-        } finally {
-            // Hide loading and show results
-            loadingContainer.style.display = 'none';
-            resultsContainer.style.display = 'grid';
-            
-            // Add .active class to cards to trigger animation
-            const cards = resultsContainer.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.classList.add('active');
-                }, index * 100); // Stagger the animation
-            });
+    aiAnalysisNewModalOverlay.addEventListener('click', (e) => {
+        if (e.target === aiAnalysisNewModalOverlay) {
+            closeAllModals();
         }
     });
-
-    closeAiAnalysisModalBtn.addEventListener('click', () => {
-        aiAnalysisModalOverlay.classList.remove('active');
-    });
-
-    aiAnalysisModalOverlay.addEventListener('click', (e) => {
-        if (e.target === aiAnalysisModalOverlay) {
-            aiAnalysisModalOverlay.classList.remove('active');
-        }
-    });
-
-    const replayModalOverlay = document.getElementById('replayModalOverlay');
-    const openReplayModalBtn = document.getElementById('replayBtn');
-    const closeReplayModalBtn = document.getElementById('closeReplayModal');
-    const cancelReplayBtn = document.getElementById('cancelReplayBtn');
-    const sendReplayBtn = document.getElementById('sendReplayBtn');
-    const replayInputForm = document.getElementById('replayInputForm');
-    const replayResultsDisplay = document.getElementById('replayResultsDisplay');
-    const closeReplayResultsBtn = document.getElementById('closeReplayResultsBtn');
-
-
-    openReplayModalBtn.addEventListener('click', async () => {
-        if (openReplayModalBtn.classList.contains('disabled')) {
-            selectRequestModalOverlay.classList.add('active');
-            return;
-        }
-
-        if (!currentPacketRequestId) {
-            alert('Please select a request to replay.');
-            return;
-        }
-
-        // Show input form, hide results display
-        replayInputForm.style.display = 'flex';
-        replayResultsDisplay.style.display = 'none';
-
-        // Fetch original request details to populate the modal
-        try {
-            const response = await fetch(`/api/requests/${currentPacketRequestId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch request details.');
-            }
-            const data = await response.json();
-
-            document.getElementById('replayMethod').value = data.method;
-            document.getElementById('replayUrl').value = data.url;
-            document.getElementById('replayHeaders').value = JSON.stringify(JSON.parse(data.req_headers), null, 2);
-            
-            // Decode base64 body before displaying
-            const reqBody = data.req_body ? atob(data.req_body) : '';
-            document.getElementById('replayBody').value = reqBody;
-
-            replayModalOverlay.classList.add('active');
-        } catch (error) {
-            console.error('Replay prep error:', error);
-            alert(`Error preparing replay: ${error.message}`);
-        }
-    });
-
-    closeReplayModalBtn.addEventListener('click', () => {
-        replayModalOverlay.classList.remove('active');
-    });
-
-    cancelReplayBtn.addEventListener('click', () => {
-        replayModalOverlay.classList.remove('active');
-    });
+    closeAiAnalysisNewModal.addEventListener('click', closeAllModals);
 
     replayModalOverlay.addEventListener('click', (e) => {
         if (e.target === replayModalOverlay) {
-            replayModalOverlay.classList.remove('active');
+            closeAllModals();
         }
     });
-
-    const replayTabs = document.querySelectorAll('.replay-tab');
-    const replayTabContents = document.querySelectorAll('.replay-tab-content');
-
-    replayTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabName = tab.dataset.tab;
-
-            replayTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-
-            replayTabContents.forEach(c => {
-                if (c.dataset.tabContent === tabName) {
-                    c.classList.add('active');
-                } else {
-                    c.classList.remove('active');
-                }
-            });
-        });
-    });
-
-    sendReplayBtn.addEventListener('click', async () => {
-        const originalId = currentPacketRequestId;
-        const method = document.getElementById('replayMethod').value;
-        const url = document.getElementById('replayUrl').value;
-        let headers;
-        try {
-            headers = JSON.parse(document.getElementById('replayHeaders').value);
-        } catch (e) {
-            alert('Invalid JSON in headers field.');
-            return;
-        }
-        const body = document.getElementById('replayBody').value;
-
-        // Show loading state (optional, but good UX)
-        // For now, just hide input and show a message or go directly to results
-        replayInputForm.style.display = 'none';
-        replayResultsDisplay.style.display = 'flex'; // Temporarily show to put loading message if needed
-
-        try {
-            const response = await fetch('/api/replay', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    originalId,
-                    method,
-                    url,
-                    headers,
-                    body,
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Replay request failed.');
-            }
-
-            const data = await response.json(); // { ok: true, newRequestId: '...' }
-            
-            // Fetch the details of the newly replayed request
-            const replayedDetailsResponse = await fetch(`/api/requests/${data.newRequestId}`);
-            if (!replayedDetailsResponse.ok) {
-                throw new Error('Failed to fetch details of replayed request.');
-            }
-            const replayedData = await replayedDetailsResponse.json();
-
-            // Populate results display
-            document.getElementById('replayedStatus').textContent = `${replayedData.res_status} ${replayedData.method} ${replayedData.url}`;
-            document.getElementById('replayedReqHeaders').textContent = JSON.stringify(JSON.parse(replayedData.req_headers), null, 2);
-            document.getElementById('replayedReqBody').textContent = replayedData.req_body ? atob(replayedData.req_body) : 'No request body.';
-            document.getElementById('replayedResHeaders').textContent = JSON.stringify(JSON.parse(replayedData.res_headers), null, 2);
-            document.getElementById('replayedResBody').textContent = replayedData.res_body ? atob(replayedData.res_body) : 'No response body.';
-
-            // Show results display, hide input form
-            replayInputForm.style.display = 'none';
-            replayResultsDisplay.style.display = 'flex';
-            
-            // Optionally update the main requests table to show the new replayed request
-            // This might involve calling applyFilters() or a more targeted update
-            // For now, we'll just let the WebSocket pick it up or require a refresh
-            // applyFilters(); // This is exported from requests.js, would need to import
-            
-        } catch (error) {
-            console.error('Replay error:', error);
-            alert(`Error replaying request: ${error.message}`);
-            // If an error, show input form again or keep results display with error
-            replayInputForm.style.display = 'flex';
-            replayResultsDisplay.style.display = 'none';
-        }
-    });
-
-    closeReplayResultsBtn.addEventListener('click', () => {
-        replayModalOverlay.classList.remove('active');
-        // Optionally reset form/results state here if modal is reopened frequently
-    });
-
-    // Event listener for the new Intercept button
-    newReqBtn.addEventListener('click', () => {
-        interceptModalOverlay.classList.add('active');
-    });
-
-    // Event listeners for closing the Intercept modal
-    closeInterceptModal.addEventListener('click', () => {
-        interceptModalOverlay.classList.remove('active');
-    });
-
-    cancelInterceptSettings.addEventListener('click', () => {
-        interceptModalOverlay.classList.remove('active');
-    });
-
-    interceptModalOverlay.addEventListener('click', (e) => {
-        if (e.target === interceptModalOverlay) {
-            interceptModalOverlay.classList.remove('active');
-        }
-    });
-
-    closeSelectRequestModalBtn.addEventListener('click', () => {
-        selectRequestModalOverlay.classList.remove('active');
-    });
+    closeReplayModal.addEventListener('click', closeAllModals);
 
     selectRequestModalOverlay.addEventListener('click', (e) => {
         if (e.target === selectRequestModalOverlay) {
-            selectRequestModalOverlay.classList.remove('active');
+            closeAllModals();
         }
     });
+    closeSelectRequestModalBtn.addEventListener('click', closeAllModals);
+
+    warningModalOverlay.addEventListener('click', (e) => {
+        if (e.target === warningModalOverlay) {
+            closeAllModals();
+        }
+    });
+    // The confirmClearBtn has its own handler in main.js, which also closes the modal.
+    // We only need to handle cancel here if it's not already handled.
+    if (cancelClearBtn) {
+        cancelClearBtn.addEventListener('click', closeAllModals);
+    }
+    
+
+    // Event Listeners for opening modals
+    if (statsToggleBtn) {
+        statsToggleBtn.addEventListener('click', () => {
+            closeAllModals(); // Close any other open modals
+            statsModalOverlay.classList.add('active');
+            renderStatsCharts(); // Render/update charts when modal opens
+        });
+    }
+
+    if (aiAnalyzeBtn) {
+        aiAnalyzeBtn.addEventListener('click', async () => {
+            if (!currentPacketRequestId) {
+                closeAllModals();
+                selectRequestModalOverlay.classList.add('active');
+                return;
+            }
+            closeAllModals();
+            aiAnalysisNewModalOverlay.classList.add('active');
+
+            const loadingContainer = document.getElementById('loadingContainer');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const securityContent = document.getElementById('securityContent');
+            const insightsContent = document.getElementById('insightsContent');
+            const performanceContent = document.getElementById('performanceContent');
+            const recommendationsContent = document.getElementById('recommendationsContent');
+
+            loadingContainer.style.display = 'flex';
+            resultsContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+            
+            // Clear previous results
+            securityContent.innerHTML = '';
+            insightsContent.innerHTML = '';
+            performanceContent.innerHTML = '';
+            recommendationsContent.innerHTML = '';
+
+            try {
+                // Simulate progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 90) {
+                        progressBar.style.width = `${progress}%`;
+                        progressText.textContent = `${progress}%`;
+                    } else {
+                        clearInterval(interval);
+                    }
+                }, 200);
+
+                const response = await fetch(`/api/ai-inspect/${currentPacketRequestId}`);
+                const data = await response.json();
+
+                clearInterval(interval); // Stop simulation
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+
+                if (data) {
+                    securityContent.innerHTML = marked.parse(data.security || 'No security insights.');
+                    insightsContent.innerHTML = marked.parse(data.insights || 'No general insights.');
+                    performanceContent.innerHTML = marked.parse(data.performance || 'No performance insights.');
+                    recommendationsContent.innerHTML = marked.parse(data.recommendations || 'No recommendations.');
+                } else {
+                    securityContent.innerHTML = 'Failed to get AI analysis.';
+                    insightsContent.innerHTML = '';
+                    performanceContent.innerHTML = '';
+                    recommendationsContent.innerHTML = '';
+                }
+
+                loadingContainer.style.display = 'none';
+                resultsContainer.style.display = 'grid'; // Changed to grid for cards-grid
+            } catch (error) {
+                console.error('Error fetching AI analysis:', error);
+                clearInterval(interval); // Stop simulation on error
+                loadingContainer.style.display = 'none';
+                resultsContainer.style.display = 'grid'; // Still display results container to show error
+                securityContent.innerHTML = 'Error: Could not fetch AI analysis.';
+                insightsContent.innerHTML = '';
+                performanceContent.innerHTML = '';
+                recommendationsContent.innerHTML = '';
+            }
+        });
+    }
+
+    if (replayBtn) {
+        replayBtn.addEventListener('click', async () => {
+            if (!currentPacketRequestId) {
+                closeAllModals();
+                selectRequestModalOverlay.classList.add('active');
+                return;
+            }
+            closeAllModals();
+            replayModalOverlay.classList.add('active');
+            
+            try {
+                const response = await fetch(`/api/requests/${currentPacketRequestId}`);
+                const data = await response.json();
+
+                document.getElementById('replayMethod').value = data.method;
+                document.getElementById('replayUrl').value = data.url;
+                
+                // Decode headers if base64 encoded, otherwise parse as JSON string
+                let decodedReqHeaders = data.req_headers;
+                try {
+                    // Attempt to parse to pretty print, if it fails, use as is.
+                    decodedReqHeaders = JSON.stringify(JSON.parse(data.req_headers), null, 2);
+                } catch (e) {
+                    console.warn("Could not parse request headers to JSON, using raw string.", e);
+                }
+                document.getElementById('replayHeaders').value = decodedReqHeaders;
+
+                // Decode body if base64 encoded, otherwise use as is.
+                // Assuming `req_body` is base64 encoded as per `packet-details.js`
+                let decodedReqBody = '';
+                if (data.req_body) {
+                    try {
+                        decodedReqBody = atob(data.req_body);
+                        // Try to pretty print if it's JSON
+                        if (data.req_content_type && data.req_content_type.includes('json')) {
+                            decodedReqBody = JSON.stringify(JSON.parse(decodedReqBody), null, 2);
+                        }
+                    } catch (e) {
+                        console.warn("Could not decode or parse request body, using raw.", e);
+                        decodedReqBody = atob(data.req_body); // Fallback to raw decoded
+                    }
+                }
+                document.getElementById('replayBody').value = decodedReqBody;
+
+                // Set initial active tab to headers (or body if headers are empty)
+                const replayHeadersTab = document.querySelector('.replay-tab[data-tab="headers"]');
+                const replayBodyTab = document.querySelector('.replay-tab[data-tab="body"]');
+                const replayHeadersContent = document.querySelector('.replay-tab-content[data-tab-content="headers"]');
+                const replayBodyContent = document.querySelector('.replay-tab-content[data-tab-content="body"]');
+
+                if (decodedReqHeaders.trim() !== '') {
+                    replayHeadersTab.classList.add('active');
+                    replayHeadersContent.classList.add('active');
+                    replayBodyTab.classList.remove('active');
+                    replayBodyContent.classList.remove('active');
+                } else if (decodedReqBody.trim() !== '') {
+                    replayBodyTab.classList.add('active');
+                    replayBodyContent.classList.add('active');
+                    replayHeadersTab.classList.remove('active');
+                    replayHeadersContent.classList.remove('active');
+                } else {
+                    // Default to headers if both are empty
+                    replayHeadersTab.classList.add('active');
+                    replayHeadersContent.classList.add('active');
+                    replayBodyTab.classList.remove('active');
+                    replayBodyContent.classList.remove('active');
+                }
+
+            } catch (error) {
+                console.error('Error fetching request details for replay:', error);
+                alert('Failed to load request details for replay. Please try again.');
+                closeAllModals();
+            }
+        });
+    }
 }

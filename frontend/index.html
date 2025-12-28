@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="css/_switch.css">
     <link rel="stylesheet" href="css/_replay.css">
     <link rel="stylesheet" href="css/_warning-modal.css">
+
 </head>
 <body class="light app-body">
     <header>
@@ -72,12 +73,7 @@
                     <button class="btn btn-danger" id="clearBtn">
                         <i class="fas fa-trash-alt"></i> Clear All
                     </button>
-                    <button class="btn btn-gray" id="newReqBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="16px" height="16px" viewBox="0 0 24 24" style="margin-right: 8px;">
-                            <path d="m2 12 5 4v-3h9v-2H7V8z"/>
-                            <path d="M13.001 2.999a8.938 8.938 0 0 0-6.364 2.637L8.051 7.05c1.322-1.322 3.08-2.051 4.95-2.051s3.628.729 4.95 2.051 2.051 3.08 2.051 4.95-.729 3.628-2.051 4.95-3.08 2.051-4.95 2.051-3.628-.729-4.95-2.051l-1.414 1.414c1.699 1.7 3.959 2.637 6.364 2.637s4.665-.937 6.364-2.637c1.7-1.699 2.637-3.959 2.637-6.364s-.937-4.665-2.637-6.364a8.938 8.938 0 0 0-6.364-2.637z"/>
-                        </svg> Intercept
-                    </button>
+
                     <button class="btn btn-outline" id="statsToggleBtn">
                         <i class="fas fa-chart-bar"></i> Statistics
                     </button>
@@ -578,38 +574,7 @@ Date: Wed, 28 Nov 2025 15:30:45 GMT</div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="interceptModalOverlay">
-        <div class="modal" style="max-width: 500px; width: 90%;">
-            <div class="modal-header">
-                <h2 class="modal-title">Intercept Settings</h2>
-                <button class="close-modal" id="closeInterceptModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-content">
-                <div class="form-group">
-                    <label for="interceptPath">Path:</label>
-                    <input type="text" id="interceptPath" class="form-control" placeholder="/api/data">
-                </div>
-                <div class="form-group">
-                    <label for="interceptOrigin">Origin:</label>
-                    <input type="text" id="interceptOrigin" class="form-control" placeholder="localhost or 127.0.0.1">
-                </div>
-                <div class="form-group">
-                    <label for="interceptMode">Intercept Mode:</label>
-                    <select id="interceptMode" class="form-control">
-                        <option value="incoming">Incoming</option>
-                        <option value="outgoing">Outgoing</option>
-                        <option value="both">Both</option>
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn-primary" id="saveInterceptSettings">Save</button>
-                    <button class="btn btn-secondary" id="cancelInterceptSettings">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <div class="modal-overlay" id="selectRequestModalOverlay">
         <div class="modal">
