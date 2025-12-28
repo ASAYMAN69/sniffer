@@ -261,6 +261,8 @@ export async function showPacketDetails(requestId) {
         document.getElementById('packetDuration').textContent = `${data.durationMs} ms`;
         document.getElementById('packetReqSize').textContent = data.req_size ? `${(data.req_size / 1024).toFixed(2)} KB` : 'N/A';
         document.getElementById('packetResSize').textContent = data.res_size ? `${(data.res_size / 1024).toFixed(2)} KB` : 'N/A';
+        document.getElementById('packetClientIp').textContent = data.client_ip || 'N/A';
+        document.getElementById('packetRequestHost').textContent = data.request_host || 'N/A';
 
         // Set the response status line
         document.getElementById('packetResStatusLine').textContent = `HTTP/1.1 ${data.res_status} OK`;

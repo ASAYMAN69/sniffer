@@ -128,6 +128,8 @@ app.get('/api/requests/:id', (req, res) => {
         res_truncated: row.res_truncated,
         res_size: row.res_size,
         res_content_type: row.res_content_type,
+        client_ip: row.client_ip, // New field
+        request_host: row.request_host, // New field
     });
 });
 

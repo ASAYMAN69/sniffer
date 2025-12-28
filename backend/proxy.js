@@ -49,14 +49,17 @@ function processAndStoreBody(bodyBuf, fullContentType) {
 }
 
 
-function createProxyServer(wss, inspectorWss) {
-    const server = http.createServer(async (clientReq, clientRes) => {
-        const id = genId();
-        const startedAt = Date.now();
+    function createProxyServer(wss, inspectorWss) {
+        const server = http.createServer(async (clientReq, clientRes) => {
+            const id = genId();
+            const startedAt = Date.now();
 
-        try {
-            const { buf: reqBodyBuf, truncated: reqTruncated, total: reqTotal } =
-                await readBodyWithCap(clientReq, MAX_BODY_BYTES);
+            // Extract client IP and host from headers
+            const clientIp = clientReq.headers['x-forwarded-for'] || clientReq.socket.remoteAddress;
+            const requestHost = clientReq.headers['x-forwarded-host'] || clientReq.headers['host'];
+
+            try {
+                const { buf: reqBodyBuf, truncated: reqTruncated, total: reqTotal } =                await readBodyWithCap(clientReq, MAX_BODY_BYTES);
 
             const options = {
                 hostname: TARGET_HOST,
@@ -101,12 +104,13 @@ function createProxyServer(wss, inspectorWss) {
                         res_headers: tryJSON(upstreamRes.headers),
                         res_body: resBodyForDb,
                         res_truncated: resTruncated ? 1 : 0,
-                        res_size: resTotal,
-                        res_content_type: resFullContentType,
-                        replayed: 0, // Mark as original request
-                    };
-                    insertStmt.run(record);
-
+                                                    res_size: resTotal,
+                                                    res_content_type: resFullContentType,
+                                                    replayed: 0, // Mark as original request
+                                                    client_ip: clientIp, // New field
+                                                    request_host: requestHost, // New field
+                                                };
+                                                insertStmt.run(record);
                     wss.clients.forEach(client => {
                         if (client.readyState === WebSocket.OPEN) {
                             client.send(JSON.stringify({
@@ -153,13 +157,14 @@ function createProxyServer(wss, inspectorWss) {
                         res_headers: '{}',
                         res_body: resBodyForDb,
                         res_truncated: 0,
-                        res_size: errorResBodyBuf.length,
-                        res_content_type: errorResContentType,
-                        replayed: 0, // Mark as original request
-                    });
-                } catch (dbErr) {
-                    console.error('DB insert on error failed:', dbErr);
-                }
+                                                    res_size: errorResBodyBuf.length,
+                                                    res_content_type: errorResContentType,
+                                                    replayed: 0, // Mark as original request
+                                                    client_ip: clientIp, // New field
+                                                    request_host: requestHost, // New field
+                                                });
+                                            } catch (dbErr) {
+                                                console.error('DB insert on error failed:', dbErr);                }
             });
 
             if (reqBodyBuf && reqBodyBuf.length) upstream.write(reqBodyBuf);

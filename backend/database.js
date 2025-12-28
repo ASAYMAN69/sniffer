@@ -29,7 +29,9 @@ CREATE TABLE IF NOT EXISTS requests (
   res_truncated INTEGER,
   res_size INTEGER,
   res_content_type TEXT,
-  replayed INTEGER DEFAULT 0
+  replayed INTEGER DEFAULT 0,
+  client_ip TEXT,
+  request_host TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_startedAt ON requests(startedAt DESC);
 `);
@@ -63,13 +65,17 @@ INSERT INTO requests (
   method, url,
   req_headers, req_body, req_truncated, req_size, req_content_type,
   res_status, res_headers, res_body, res_truncated, res_size, res_content_type,
-  replayed
+  replayed,
+  client_ip,
+  request_host
 ) VALUES (
   @id, @startedAt, @endedAt, @durationMs,
   @method, @url,
   @req_headers, @req_body, @req_truncated, @req_size, @req_content_type,
   @res_status, @res_headers, @res_body, @res_truncated, @res_size, @res_content_type,
-  @replayed
+  @replayed,
+  @client_ip,
+  @request_host
 )
 `);
 
